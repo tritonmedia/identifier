@@ -15,7 +15,7 @@ func main() {
 		log.Fatalf("failed to connect to rabbitmq: %v", err)
 	}
 
-	msgs, err := client.Consume("v1.identifier")
+	msgs, err := client.Consume("v1.identify")
 	if err != nil {
 		log.Fatalf("failed to consume from queues: %v", err)
 	}
