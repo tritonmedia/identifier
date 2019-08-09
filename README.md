@@ -1,4 +1,7 @@
+
 # identifier
+
+[![goreport](https://goreportcard.com/badge/github.com/tritonmedia/identifier)](https://goreportcard.com/report/github.com/tritonmedia/identifier)
 
 Identify your media regardless of the metadata provider.
 
