@@ -22,7 +22,7 @@ dep:
 .PHONY: build
 build:
 	@echo " ===> building releases in ./bin/... <=== "
-	CGO_ENABLED=1 $(GO) build -o $(BINDIR)/identifier -v $(GOFLAGS) -tags '$(TAGS)' -ldflags '$(LDFLAGS)' $(PKGDIR)...
+	CGO_ENABLED=1 $(GO) build -o $(BINDIR)/identifier -v $(GOFLAGS) -tags '$(TAGS)' -ldflags '$(LDFLAGS)' $(PKGDIR)
 
 .PHONY: gofmt
 gofmt:
