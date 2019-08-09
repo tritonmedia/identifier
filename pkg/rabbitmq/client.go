@@ -1,10 +1,10 @@
 package rabbitmq
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
 
@@ -23,6 +23,14 @@ type Client struct {
 	// rk modification mutex
 	rkmutex sync.Mutex
 }
+
+var (
+	// ErrorEnsureExchange is returned when exchanges are unable to be created
+	ErrorEnsureExchange = errors.New("failed to ensure exchange")
+
+	// ErrorEnsureConsumerQueues is returned when consumer queues are unable to be created
+	ErrorEnsureConsumerQueues = errors.New("failed to ensure consumer queues")
+)
 
 // NewClient returns a new rabbitmq client
 func NewClient(endpoint string) (*Client, error) {
@@ -95,12 +103,11 @@ func (c *Client) Publish(topic string, body []byte) error {
 		return err
 	}
 
-	// TODO(jaredallard): error handle
 	if err := c.ensureExchange(topic); err != nil {
-		log.Warnf("failed to ensure exchange: %v", err)
+		return ErrorEnsureExchange
 	}
 	if err := c.ensureConsumerQueues(topic); err != nil {
-		log.Warnf("failed to ensure consumer queues: %v", err)
+		return ErrorEnsureConsumerQueues
 	}
 
 	rkIndex := c.lastPublishRk[topic]
@@ -127,12 +134,11 @@ func (c *Client) Consume(topic string) (<-chan amqp.Delivery, error) {
 		return nil, err
 	}
 
-	// TODO(jaredallard): error handle
 	if err := c.ensureExchange(topic); err != nil {
-		log.Warnf("failed to ensure exchange: %v", err)
+		return nil, ErrorEnsureExchange
 	}
 	if err := c.ensureConsumerQueues(topic); err != nil {
-		log.Warnf("failed to ensure consumer queues: %v", err)
+		return nil, ErrorEnsureConsumerQueues
 	}
 
 	multiplexer := make(chan amqp.Delivery)
