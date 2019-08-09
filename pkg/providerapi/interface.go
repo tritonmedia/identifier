@@ -1,5 +1,7 @@
 package providerapi
 
+import "time"
+
 // ImageType is the type of image an image is
 type ImageType int
 
@@ -53,7 +55,10 @@ type Metadata struct {
 	Network string
 
 	// FirstAired is when this first aired
-	FirstAired string
+	FirstAired *time.Time
+
+	// FinishedAiring is when this finished airing, if applicable
+	FinishedAriring *time.Time
 
 	// Genre types
 	Genre []string
