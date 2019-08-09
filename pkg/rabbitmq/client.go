@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
 
@@ -31,8 +32,9 @@ func NewClient(endpoint string) (*Client, error) {
 	}
 
 	return &Client{
-		lastPublishRk: make(map[string]int),
-		connection:    conn,
+		lastPublishRk:     make(map[string]int),
+		connection:        conn,
+		numConsumerQueues: 2,
 	}, nil
 }
 
@@ -43,6 +45,7 @@ func (c *Client) ensureExchange(topic string) error {
 	if err != nil {
 		return err
 	}
+	defer aChan.Close()
 
 	return aChan.ExchangeDeclare(topic, "direct", true, false, false, false, amqp.Table{})
 }
@@ -53,6 +56,7 @@ func (c *Client) ensureConsumerQueues(topic string) error {
 	if err != nil {
 		return err
 	}
+	defer aChan.Close()
 
 	for i := 0; i != c.numConsumerQueues; i++ {
 		queue := c.getRk(topic, i)
@@ -76,7 +80,7 @@ func (c *Client) getChannel() (*amqp.Channel, error) {
 
 // Channel returns a raw RabbitMQ channel
 func (c *Client) Channel() (*amqp.Channel, error) {
-	return c.connection.Channel()
+	return c.getChannel()
 }
 
 // getRK gets the expected queue and rk name for a numberic consumer
@@ -89,6 +93,14 @@ func (c *Client) Publish(topic string, body []byte) error {
 	aChan, err := c.getChannel()
 	if err != nil {
 		return err
+	}
+
+	// TODO(jaredallard): error handle
+	if err := c.ensureExchange(topic); err != nil {
+		log.Warnf("failed to ensure exchange: %v", err)
+	}
+	if err := c.ensureConsumerQueues(topic); err != nil {
+		log.Warnf("failed to ensure consumer queues: %v", err)
 	}
 
 	rkIndex := c.lastPublishRk[topic]
@@ -113,6 +125,14 @@ func (c *Client) Consume(topic string) (<-chan amqp.Delivery, error) {
 	aChan, err := c.getChannel()
 	if err != nil {
 		return nil, err
+	}
+
+	// TODO(jaredallard): error handle
+	if err := c.ensureExchange(topic); err != nil {
+		log.Warnf("failed to ensure exchange: %v", err)
+	}
+	if err := c.ensureConsumerQueues(topic); err != nil {
+		log.Warnf("failed to ensure consumer queues: %v", err)
 	}
 
 	multiplexer := make(chan amqp.Delivery)
