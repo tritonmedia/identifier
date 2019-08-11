@@ -124,6 +124,9 @@ type Episode struct {
 	// Overview of this episode
 	Overview string
 
+	// Aired is when a this episode aired
+	Aired *time.Time
+
 	// Rating (1-10) of this episode
 	Rating float32
 

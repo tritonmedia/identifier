@@ -131,6 +131,17 @@ func (c *Client) GetEpisodes(series *providerapi.Series) ([]providerapi.Episode,
 			Resolution: fmt.Sprintf("%sx%s", e.ThumbHeight, e.ThumbWidth),
 		}
 
+		var firstAired *time.Time
+		if e.FirstAired != "" {
+			time, err := time.Parse("2006-01-02", e.FirstAired)
+			if err != nil {
+				// TODO(jaredallard): better parse error handling
+				continue
+			}
+
+			firstAired = &time
+		}
+
 		eps[i] = providerapi.Episode{
 			Number:       int64(e.AbsoluteNumber),
 			SeasonNumber: int64(e.AiredEpisodeNumber),
@@ -138,6 +149,7 @@ func (c *Client) GetEpisodes(series *providerapi.Series) ([]providerapi.Episode,
 			Name:         e.EpisodeName,
 			Overview:     e.Overview,
 			Rating:       e.SiteRating,
+			Aired:        firstAired,
 			Thumb:        img,
 		}
 	}

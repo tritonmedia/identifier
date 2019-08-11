@@ -76,16 +76,17 @@ func (c *Client) GetSeries(strid string) (providerapi.Series, error) {
 		// 100 -> 10
 		Rating: float32(rating * 0.10),
 
-		// not exposed
-		Network: "",
+		FirstAired: firstAired,
+		Status:     status,
 
-		FirstAired:   firstAired,
-		Status:       status,
+		// These aren't exposed by Kitsu
+		Network:      "",
 		Genre:        []string{},
 		Airs:         "",
 		AirDayOfWeek: "",
 		Runtime:      0,
-		Images:       images,
+
+		Images: images,
 	}
 	return s, nil
 }
@@ -99,12 +100,23 @@ func (c *Client) GetEpisodes(s *providerapi.Series) ([]providerapi.Episode, erro
 
 	newEps := make([]providerapi.Episode, len(eps))
 	for i, e := range eps {
+		var firstAired *time.Time
+		if e.Attributes.Airdate != "" {
+			time, err := time.Parse("2006-01-02", e.Attributes.Airdate)
+			if err != nil {
+				continue
+			}
+
+			firstAired = &time
+		}
+
 		newEps[i] = providerapi.Episode{
 			Number:       int64(e.Attributes.Number),
 			SeasonNumber: int64(e.Attributes.RelativeNumber),
 			Season:       e.Attributes.SeasonNumber,
 			Name:         e.Attributes.CanonicalTitle,
 			Overview:     e.Attributes.Synopsis,
+			Aired:        firstAired,
 			Rating:       10,
 		}
 	}
