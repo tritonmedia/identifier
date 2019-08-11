@@ -22,8 +22,8 @@ func main() {
 		CreatedAt: time.Now().Format(time.RFC3339),
 		Media: &api.Media{
 			Id:         "xxx",
-			Metadata:   api.Media_TVDB,
-			MetadataId: "291627",
+			Metadata:   api.Media_IMDB,
+			MetadataId: "tt0417299",
 		},
 	}
 	b, err := proto.Marshal(&i)

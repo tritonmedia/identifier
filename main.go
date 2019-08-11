@@ -8,6 +8,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
 	"github.com/tritonmedia/identifier/pkg/providerapi"
+	"github.com/tritonmedia/identifier/pkg/providerapi/imdb"
 	"github.com/tritonmedia/identifier/pkg/providerapi/tvdb"
 	"github.com/tritonmedia/identifier/pkg/rabbitmq"
 	api "github.com/tritonmedia/tritonmedia.go/pkg/proto"
@@ -16,13 +17,16 @@ import (
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 
-	enabledProviders := []api.Media_MetadataType{api.Media_TVDB}
+	enabledProviders := []api.Media_MetadataType{api.Media_TVDB, api.Media_IMDB}
+
 	providers := make(map[api.Media_MetadataType]providerapi.Fetcher)
+	clients := make(map[api.Media_MetadataType]interface{})
 
 	for _, p := range enabledProviders {
 		envBase := fmt.Sprintf("IDENTIFIER_%s", strings.ToUpper(p.String()))
 
 		var provider providerapi.Fetcher
+		var client interface{}
 		switch p {
 		case api.Media_TVDB:
 			apiKey := os.Getenv(fmt.Sprintf("%s_APIKEY", envBase))
@@ -39,12 +43,22 @@ func main() {
 				continue
 			}
 
+			client = prov
 			provider = prov
 			break
+		case api.Media_IMDB:
+			if clients[api.Media_TVDB] == nil {
+				log.Errorf("IMDB api wraps TVDB, and TVDB wasn't loaded, refusing to load")
+			}
+
+			t := providers[api.Media_TVDB].(*tvdb.Client)
+
+			provider = imdb.NewClient(t)
 		default:
 			log.Errorf("unknown media provider id %d (%s)", p, p.String())
 		}
 
+		clients[p] = client
 		providers[p] = provider
 	}
 
@@ -91,7 +105,7 @@ func main() {
 		s, err := p.GetSeries(job.Media.MetadataId)
 		if err != nil {
 			log.Errorf(err.Error())
-			if err := msg.Nack(false, true); err != nil {
+			if err := msg.Nack(false, false); err != nil {
 				log.Warnf("failed to nack failed message: %v", err)
 			}
 			continue
@@ -100,7 +114,7 @@ func main() {
 		e, err := p.GetEpisodes(&s)
 		if err != nil {
 			log.Errorf(err.Error())
-			if err := msg.Nack(false, true); err != nil {
+			if err := msg.Nack(false, false); err != nil {
 				log.Warnf("failed to nack failed message: %v", err)
 			}
 			continue

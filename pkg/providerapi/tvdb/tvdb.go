@@ -37,8 +37,8 @@ type Config struct {
 
 // Client implements the providerapi interface
 type Client struct {
-	config *Config
-	client *tvdb.Client
+	config     *Config
+	TVDBclient *tvdb.Client
 }
 
 // NewClient returns a tvdb client
@@ -54,8 +54,8 @@ func NewClient(c *Config) (*Client, error) {
 	}
 
 	return &Client{
-		config: c,
-		client: client,
+		config:     c,
+		TVDBclient: client,
 	}, nil
 }
 
@@ -63,12 +63,12 @@ func (c *Client) getSeriesImages(seriesID int) ([]providerapi.Image, error) {
 	imgs := make([]tvdb.Image, 0)
 	types := map[string]func(s *tvdb.Series) error{
 		// backgrounds
-		"fanart": c.client.GetSeriesFanartImages,
+		"fanart": c.TVDBclient.GetSeriesFanartImages,
 		// poster
-		"poster": c.client.GetSeriesPosterImages,
+		"poster": c.TVDBclient.GetSeriesPosterImages,
 
 		// not used yet
-		// "series": c.client.GetSeriesSeriesImages,
+		// "series": c.TVDBclient.GetSeriesSeriesImages,
 	}
 
 	// hit the api for each type of image we want
@@ -118,7 +118,7 @@ func (c *Client) GetEpisodes(series *providerapi.Series) ([]providerapi.Episode,
 	s := &tvdb.Series{
 		ID: id,
 	}
-	if err := c.client.GetSeriesEpisodes(s, url.Values{}); err != nil {
+	if err := c.TVDBclient.GetSeriesEpisodes(s, url.Values{}); err != nil {
 		return nil, errors.Wrap(err, "failed to get episodes")
 	}
 
@@ -157,7 +157,7 @@ func (c *Client) GetSeries(strid string) (providerapi.Series, error) {
 		ID: id,
 	}
 
-	if err := c.client.GetSeries(s); err != nil {
+	if err := c.TVDBclient.GetSeries(s); err != nil {
 		return providerapi.Series{}, err
 	}
 
@@ -181,7 +181,7 @@ func (c *Client) GetSeries(strid string) (providerapi.Series, error) {
 	case "Ended":
 		status = providerapi.SeriesEnded
 		break
-	case "StatusContinuing":
+	case "Continuing":
 		status = providerapi.SeriesAiring
 		break
 	}
