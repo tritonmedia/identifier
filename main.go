@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tritonmedia/identifier/pkg/providerapi"
 	"github.com/tritonmedia/identifier/pkg/providerapi/imdb"
+	"github.com/tritonmedia/identifier/pkg/providerapi/kitsu"
 	"github.com/tritonmedia/identifier/pkg/providerapi/tvdb"
 	"github.com/tritonmedia/identifier/pkg/rabbitmq"
 	api "github.com/tritonmedia/tritonmedia.go/pkg/proto"
@@ -17,7 +18,7 @@ import (
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 
-	enabledProviders := []api.Media_MetadataType{api.Media_TVDB, api.Media_IMDB}
+	enabledProviders := []api.Media_MetadataType{api.Media_TVDB, api.Media_IMDB, api.Media_KITSU}
 
 	providers := make(map[api.Media_MetadataType]providerapi.Fetcher)
 	clients := make(map[api.Media_MetadataType]interface{})
@@ -54,6 +55,8 @@ func main() {
 			t := providers[api.Media_TVDB].(*tvdb.Client)
 
 			provider = imdb.NewClient(t)
+		case api.Media_KITSU:
+			provider = kitsu.NewClient()
 		default:
 			log.Errorf("unknown media provider id %d (%s)", p, p.String())
 		}

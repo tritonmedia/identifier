@@ -8,5 +8,6 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
 	github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94
+	github.com/tritonmedia/kitsu v0.2.4-0.20190811161725-5fa03d532d0f
 	github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190811003018-8f9f2b4cbb89
 )
