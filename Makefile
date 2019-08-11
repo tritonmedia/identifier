@@ -32,3 +32,7 @@ gofmt:
 .PHONY: hooks
 hooks:
 	@./hack/hooks
+
+.PHONY: test-publish
+test-publish:
+	go run ./test/publish.go

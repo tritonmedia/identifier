@@ -10,6 +10,10 @@ github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542/go.mod h1:Ow0tF8D4Kplb
 github.com/konsorten/go-windows-terminal-sequences v1.0.1 h1:mweAR1A6xJ3oS2pRaGiHgQ4OO8tzTaLawm8vnODuwDk=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32/go.mod h1:9wM+0iRr9ahx58uYLpLIr5fm8diHn0JbqRycJi6w0Ms=
+github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9 h1:bduYa9c0qpYfrxuAnursm8RfmeGsdgQeB3NeW4N0zQ8=
+github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9/go.mod h1:nhHRTrbEzdp4lXtiozX4Yuvo4AHi29nOvM1J7H/XJMM=
+github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
+github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sirupsen/logrus v1.4.2 h1:SPIRibHv4MatM3XXNO2BJeFLZwZ2LvZgfQ5+UNI2im4=
@@ -24,6 +28,8 @@ github.com/tritonmedia/tritonmedia.go v1.0.2 h1:oTwVOvHgfqWI3Cv5eJtDflgnHxDt2Uhp
 github.com/tritonmedia/tritonmedia.go v1.0.2/go.mod h1:nMLKgW2zyuRGpfDUMnS6uBv6xfFMt7jUX3chgSB1iaE=
 github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190809044606-70d90ba4b84c h1:mFYHIJmBxHehMk7daFOL31BaVX8yhA8rzEkYvSJk9ws=
 github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190809044606-70d90ba4b84c/go.mod h1:nMLKgW2zyuRGpfDUMnS6uBv6xfFMt7jUX3chgSB1iaE=
+github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190811003018-8f9f2b4cbb89 h1:7D3cOd1PiXeVTJjttAsNtUjcRO3NieP4+tCBX82y9AQ=
+github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190811003018-8f9f2b4cbb89/go.mod h1:nMLKgW2zyuRGpfDUMnS6uBv6xfFMt7jUX3chgSB1iaE=
 golang.org/x/sys v0.0.0-20190422165155-953cdadca894 h1:Cz4ceDQGXuKRnVBDTS23GTn/pU5OE2C0WrNTOYK1Uuc=
 golang.org/x/sys v0.0.0-20190422165155-953cdadca894/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 gopkg.in/d4l3k/messagediff.v1 v1.2.1 h1:70AthpjunwzUiarMHyED52mj9UwtAnE89l1Gmrt3EU0=

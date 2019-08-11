@@ -1,3 +1,4 @@
+// Package rabbitmq implements the triton-core/amqp module
 package rabbitmq
 
 import (
@@ -46,7 +47,7 @@ func NewClient(endpoint string) (*Client, error) {
 	}, nil
 }
 
-// ensureExchange ensures that your exchanges exists. Uses a seperate channel
+// ensureExchange ensures that your exchanges exists. Uses a separate channel
 // to prevent explosions
 func (c *Client) ensureExchange(topic string) error {
 	aChan, err := c.getChannel()
@@ -98,10 +99,12 @@ func (c *Client) getRk(topic string, rkIndex int) string {
 
 // Publish a message to an exchange, must be a serialized format
 func (c *Client) Publish(topic string, body []byte) error {
+	// TODO(jaredallard): consolidate to using one active channel?
 	aChan, err := c.getChannel()
 	if err != nil {
 		return err
 	}
+	defer aChan.Close()
 
 	if err := c.ensureExchange(topic); err != nil {
 		return ErrorEnsureExchange
@@ -129,6 +132,7 @@ func (c *Client) Publish(topic string, body []byte) error {
 
 // Consume from a RabbitMQ queue
 func (c *Client) Consume(topic string) (<-chan amqp.Delivery, error) {
+	// TODO(jaredallard): handle channel disconnect and allow stopping
 	aChan, err := c.getChannel()
 	if err != nil {
 		return nil, err
