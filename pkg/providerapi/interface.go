@@ -3,26 +3,23 @@ package providerapi
 import "time"
 
 // ImageType is the type of image an image is
-type ImageType int
+type ImageType string
 
 // SeriesStatus is the status of a series
 type SeriesStatus string
 
 const (
 	// ImagePoster is a poster type image
-	ImagePoster ImageType = 1
+	ImagePoster ImageType = "poster"
 
 	// ImageBackground is a background type image
-	ImageBackground ImageType = 2
+	ImageBackground ImageType = "background"
 
 	// ImageActor is an actor image
-	ImageActor ImageType = 3
+	ImageActor ImageType = "actor"
 
 	// ImageThumbnail is a thumbnail for an episode
-	ImageThumbnail ImageType = 4
-
-	// ImageSeason is a season image
-	ImageSeason ImageType = 5
+	ImageThumbnail ImageType = "thumbnail"
 
 	// SeriesAiring denotes a series is still airing
 	SeriesAiring SeriesStatus = "Airing"
