@@ -63,6 +63,9 @@ type Series struct {
 	// Title of this media
 	Title string
 
+	// ID of this media
+	ID string
+
 	// Provider that returned this, should match the v1.media metadata entry
 	Provider int
 
@@ -135,7 +138,7 @@ type Episode struct {
 // metadata
 type Fetcher interface {
 	// GetSeries returns a series by provider ID
-	GetSeries(id string) (Series, error)
+	GetSeries(mediaID string, id string) (Series, error)
 
 	// GetEpisodes returns all episodes in a series, if it's a movie it should return
 	// a single episode.

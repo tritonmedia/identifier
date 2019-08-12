@@ -158,7 +158,7 @@ func (c *Client) GetEpisodes(series *providerapi.Series) ([]providerapi.Episode,
 }
 
 // GetSeries returns a series
-func (c *Client) GetSeries(strid string) (providerapi.Series, error) {
+func (c *Client) GetSeries(mediaID string, strid string) (providerapi.Series, error) {
 	id, err := strconv.Atoi(strid)
 	if err != nil {
 		return providerapi.Series{}, errors.Wrap(err, "failed to parse id")
@@ -204,6 +204,7 @@ func (c *Client) GetSeries(strid string) (providerapi.Series, error) {
 	}
 
 	return providerapi.Series{
+		ID:           mediaID,
 		Title:        s.SeriesName,
 		ProviderID:   strid,
 		Provider:     Provider,

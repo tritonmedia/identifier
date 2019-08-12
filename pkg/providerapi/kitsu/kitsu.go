@@ -25,7 +25,7 @@ func NewClient() *Client {
 }
 
 // GetSeries returns a series by ID
-func (c *Client) GetSeries(strid string) (providerapi.Series, error) {
+func (c *Client) GetSeries(mediaID, strid string) (providerapi.Series, error) {
 	a, err := kitsu.GetAnime(strid)
 	if err != nil {
 		return providerapi.Series{}, errors.Wrap(err, "failed to get kitsu anime")
@@ -68,6 +68,7 @@ func (c *Client) GetSeries(strid string) (providerapi.Series, error) {
 	}
 
 	s := providerapi.Series{
+		ID:         mediaID,
 		Title:      a.Attributes.CanonicalTitle,
 		Provider:   Provider,
 		ProviderID: strid,
@@ -110,12 +111,17 @@ func (c *Client) GetEpisodes(s *providerapi.Series) ([]providerapi.Episode, erro
 			firstAired = &time
 		}
 
+		synp := e.Attributes.Synopsis
+		if synp == "" {
+			synp = "Not Provided"
+		}
+
 		newEps[i] = providerapi.Episode{
 			Number:       int64(e.Attributes.Number),
 			SeasonNumber: int64(e.Attributes.RelativeNumber),
 			Season:       e.Attributes.SeasonNumber,
 			Name:         e.Attributes.CanonicalTitle,
-			Overview:     e.Attributes.Synopsis,
+			Overview:     synp,
 			Aired:        firstAired,
 			Rating:       10,
 		}

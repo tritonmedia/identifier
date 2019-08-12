@@ -29,10 +29,13 @@ gofmt:
 	@echo " ===> Running go fmt <==="
 	gofmt -w ./
 
-.PHONY: hooks
-hooks:
-	@./hack/hooks
-
+# Test publising messages
 .PHONY: test-publish
 test-publish:
 	go run ./test/publish.go
+
+.PHONY: update-schemas
+update-schema:
+	@rm $(CURDIR)/pkg/storageapi/postgres/schema/schema.go || true
+	go-embed -input $(CURDIR)/pkg/storageapi/postgres/schema -output $(CURDIR)/schema.go
+	@mv $(CURDIR)/schema.go $(CURDIR)/pkg/storageapi/postgres/schema/schema.go

@@ -24,7 +24,7 @@ func NewUploader(m *minio.Client, bucketName string) *Uploader {
 }
 
 // UploadImage uploads an image to s3
-func (u *Uploader) UploadImage(mediaID, image *[]byte, i *providerapi.Image) error {
+func (u *Uploader) UploadImage(mediaID string, image *[]byte, i *providerapi.Image) error {
 	key := fmt.Sprintf("images/%s/%s-%s.png", mediaID, i.Type, i.Resolution)
 
 	if i.Resolution == "" {
