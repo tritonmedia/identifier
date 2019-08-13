@@ -4,13 +4,11 @@ package postgres
 import (
 	"bytes"
 	"compress/gzip"
-	"context"
 	"io/ioutil"
 	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx"
-	"github.com/jackc/pgx/pgtype"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -20,7 +18,7 @@ import (
 
 // Client is a postgres client
 type Client struct {
-	sql *pgx.Conn
+	sql *pgx.ConnPool
 }
 
 // NewClient returns a new storageapi compatible database provider
@@ -43,10 +41,12 @@ func NewClient() (*Client, error) {
 
 	s := string(b)
 
-	cli, err := pgx.Connect(pgx.ConnConfig{
-		Host:     "127.0.0.1",
-		User:     "postgres",
-		Database: "media",
+	cli, err := pgx.NewConnPool(pgx.ConnPoolConfig{
+		ConnConfig: pgx.ConnConfig{
+			Host:     "127.0.0.1",
+			User:     "postgres",
+			Database: "media",
+		},
 	})
 	if err != nil {
 		return nil, err
@@ -76,7 +76,10 @@ func (c *Client) NewSeries(s *providerapi.Series) error {
 
 // NewEpisodes inserts a new episodes
 func (c *Client) NewEpisodes(s *providerapi.Series, eps []providerapi.Episode) error {
-	b := c.sql.BeginBatch()
+	tx, err := c.sql.Begin()
+	if err != nil {
+		return err
+	}
 
 	for _, e := range eps {
 		id, err := uuid.NewV4()
@@ -84,23 +87,40 @@ func (c *Client) NewEpisodes(s *providerapi.Series, eps []providerapi.Episode) e
 			return errors.Wrap(err, "failed to generate id for episode")
 		}
 
-		vals := []interface{}{id.String(), s.ID, e.Number, e.Overview, e.Aired.Format(time.RFC3339)}
+		var aired string
+		if !e.Aired.IsZero() {
+			aired = e.Aired.Format(time.RFC3339)
+		} else { // default to now
+			aired = time.Now().Format(time.RFC3339)
+		}
 
-		logrus.Infof("inserting episode ID: %s: media_id='%v',number='%v',overview='%v',aired='%v'", vals[0], vals[1], vals[2], vals[3], vals[4])
-		b.Queue(`
+		logrus.Infof("inserting episode '%s': number=%d,air_date='%s'", id.String(), e.Number, aired)
+		tx.Exec(`
 			INSERT INTO episodes_v1 
-				(id, media_id, episode_number, description, air_date)
-				VALUES ($1, $2, $3, $4, $5)
-		`, vals, []pgtype.OID{pgtype.VarcharOID, pgtype.VarcharOID, pgtype.Int8OID, pgtype.TextOID, pgtype.TimestamptzOID}, nil)
+				(id, media_id, absolute_number, season, season_number, description, air_date)
+				VALUES ($1, $2, $3, $4, $5, $6, $7)
+		`, id.String(), s.ID, e.Number, e.Season, e.SeasonNumber, e.Overview, aired)
 	}
 
-	err := b.Send(context.Background(), nil)
-	if err != nil {
-		return errors.Wrap(err, "failed to add episodes")
-	}
-	if _, err := b.ExecResults(); err != nil {
+	if err := tx.Commit(); err != nil {
 		return errors.Wrap(err, "failed to add episodes")
 	}
 
 	return nil
+}
+
+// NewImage adds a new image and returns the image ID
+func (c *Client) NewImage(s *providerapi.Series, i *providerapi.Image) (string, error) {
+	id, err := uuid.NewV4()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to generate id for image")
+	}
+
+	_, err = c.sql.Exec(`
+		INSERT INTO images_v1
+			(id, media_id, image_type, checksum, rating, resolution)
+		VALUES ($1, $2, $3, $4, $5, $6)
+	`, id.String(), s.ID, i.Type, i.Checksum, i.Rating, i.Resolution)
+
+	return id.String(), err
 }

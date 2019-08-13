@@ -4,22 +4,28 @@ package image
 import (
 	"bytes"
 	"fmt"
+	"hash/crc64"
 	"image"
 	"image/jpeg"
 	"image/png"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/pkg/errors"
 	"github.com/tritonmedia/identifier/pkg/providerapi"
 )
 
 // Downloader is an image downloader that is content aware
-type Downloader struct{}
+type Downloader struct {
+	crctable *crc64.Table
+}
 
 // NewDownloader creates a new image downloader
 func NewDownloader() *Downloader {
-	return &Downloader{}
+	return &Downloader{
+		crctable: crc64.MakeTable(0xC96C5795D7870F42),
+	}
 }
 
 // DownloadImage downloads an image in memory, converting it to png
@@ -65,6 +71,9 @@ func (d *Downloader) DownloadImage(i *providerapi.Image) (*[]byte, error) {
 	}
 
 	i.Resolution = fmt.Sprintf("%dx%d", img.Width, img.Height)
+
+	ci := crc64.Checksum(data, d.crctable)
+	i.Checksum = strconv.FormatUint(ci, 16)
 
 	return &data, nil
 }

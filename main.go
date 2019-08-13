@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/minio/minio-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 	"github.com/tritonmedia/identifier/pkg/image"
@@ -19,7 +20,11 @@ import (
 	api "github.com/tritonmedia/tritonmedia.go/pkg/proto"
 )
 
-func processor(providers map[api.Media_MetadataType]providerapi.Fetcher, db storageapi.Provider, idl *image.Downloader, msg amqp.Delivery) error {
+func processor(providers map[api.Media_MetadataType]providerapi.Fetcher,
+	db storageapi.Provider,
+	idl *image.Downloader,
+	iup *image.Uploader,
+	msg amqp.Delivery) error {
 	var job api.Identify
 	if err := proto.Unmarshal(msg.Body, &job); err != nil {
 		log.WithField("event", "decode-message").Errorf("failed to unmarshal rabbitmq message into protobuf format: %v", err)
@@ -57,16 +62,6 @@ func processor(providers map[api.Media_MetadataType]providerapi.Fetcher, db stor
 		return nil
 	}
 
-	newImages := make([]providerapi.Image, len(s.Images))
-	for i, img := range s.Images {
-		// TODO(jaredallard): upload image at this step
-		if _, err := idl.DownloadImage(&img); err != nil {
-			log.Errorf("failed to process image: %v", err)
-			return nil
-		}
-		newImages[i] = img
-	}
-
 	e, err := p.GetEpisodes(&s)
 	if err != nil {
 		log.Errorf(err.Error())
@@ -85,6 +80,32 @@ func processor(providers map[api.Media_MetadataType]providerapi.Fetcher, db stor
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
+	}
+
+	log.Info("inserting images into database")
+	newImages := make([]providerapi.Image, len(s.Images))
+	for i, img := range s.Images {
+		log.Infof("downloading image '%v'", img.URL)
+		// TODO(jaredallard): upload image at this step
+		b, err := idl.DownloadImage(&img)
+		if err != nil {
+			log.Errorf("failed to process image: %v", err)
+			return nil
+		}
+
+		// TODO(jaredallard): set image ID on the actual struct?
+		log.Infof("uploading image '%v'", img.URL)
+		id, err := db.NewImage(&s, &img)
+		if err != nil {
+			log.Errorf("failed to add image to the database: %v", err)
+			return nil
+		}
+
+		if err := iup.UploadImage(s.ID, id, b, &img); err != nil {
+			log.Errorf("failed to upload image: %v", err)
+			return nil
+		}
+		newImages[i] = img
 	}
 
 	// --------
@@ -147,7 +168,7 @@ func main() {
 
 		clients[p] = client
 		providers[p] = provider
-	}
+	} // for loop end
 
 	client, err := rabbitmq.NewClient("amqp://user:bitnami@127.0.0.1:5672")
 	if err != nil {
@@ -159,7 +180,26 @@ func main() {
 		log.Fatalf("failed to initialize postgres: %v", err)
 	}
 
+	b := "IDENTIFIER_S3_"
+	m, err := minio.New(
+		os.Getenv(b+"ENDPOINT"),
+		os.Getenv(b+"ACCESS_KEY"),
+		os.Getenv(b+"SECRET_KEY"),
+
+		// TODO(jaredallard): determine from endpoint url
+		false,
+	)
+
+	if _, err := m.ListBuckets(); err != nil {
+		log.Fatalf("failed to test s3 authentication: %v", err)
+	}
+
+	if err := m.MakeBucket("triton-media", "us-west-2"); err != nil {
+		log.Warnf("failed to make bucket: %v", err)
+	}
+
 	imageDownloader := image.NewDownloader()
+	imageUploader := image.NewUploader(m, "triton-media")
 
 	msgs, err := client.Consume("v1.identify")
 	if err != nil {
@@ -168,6 +208,6 @@ func main() {
 
 	log.WithField("event", "started").Infoln("waiting for rabbitmq messages")
 	for msg := range msgs {
-		processor(providers, db, imageDownloader, msg)
+		processor(providers, db, imageDownloader, imageUploader, msg)
 	}
 }

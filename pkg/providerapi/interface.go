@@ -33,6 +33,13 @@ type Image struct {
 	// Type of this media
 	Type ImageType
 
+	// Key is the S3 key of this image, not expected to be set
+	// by a provider
+	Key string
+
+	// Checksum is a CRC64 checksum provided by the image package after download
+	Checksum string
+
 	// URL is the URL to obtain this media
 	URL string
 
@@ -83,7 +90,7 @@ type Series struct {
 	Network string
 
 	// FirstAired is when this first aired
-	FirstAired *time.Time
+	FirstAired time.Time
 
 	// Status
 	Status SeriesStatus
@@ -125,7 +132,7 @@ type Episode struct {
 	Overview string
 
 	// Aired is when a this episode aired
-	Aired *time.Time
+	Aired time.Time
 
 	// Rating (1-10) of this episode
 	Rating float32

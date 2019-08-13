@@ -24,14 +24,19 @@ func NewUploader(m *minio.Client, bucketName string) *Uploader {
 }
 
 // UploadImage uploads an image to s3
-func (u *Uploader) UploadImage(mediaID string, image *[]byte, i *providerapi.Image) error {
-	key := fmt.Sprintf("images/%s/%s-%s.png", mediaID, i.Type, i.Resolution)
+func (u *Uploader) UploadImage(mediaID, imageID string, image *[]byte, i *providerapi.Image) error {
+	key := fmt.Sprintf("images/%s/%s.png", mediaID, imageID)
 
 	if i.Resolution == "" {
 		return fmt.Errorf("image has no resolution")
 	}
 
 	img := *image
-	_, err := u.s3client.PutObject(u.bucket, key, bytes.NewReader(img), int64(len(img)), minio.PutObjectOptions{})
-	return err
+	if _, err := u.s3client.PutObject(u.bucket, key, bytes.NewReader(img), int64(len(img)), minio.PutObjectOptions{}); err != nil {
+		return err
+	}
+
+	// set the s3 key
+	i.Key = key
+	return nil
 }

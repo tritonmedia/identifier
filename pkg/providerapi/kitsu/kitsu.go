@@ -36,14 +36,14 @@ func (c *Client) GetSeries(mediaID, strid string) (providerapi.Series, error) {
 		return providerapi.Series{}, errors.Wrap(err, "failed to parse ratings as int")
 	}
 
-	var firstAired *time.Time
+	var firstAired time.Time
 	if a.Attributes.StartDate != "" {
 		time, err := time.Parse("2006-01-02", a.Attributes.StartDate)
 		if err != nil {
 			return providerapi.Series{}, errors.Wrap(err, "failed to parse startDate as time")
 		}
 
-		firstAired = &time
+		firstAired = time
 	}
 
 	// TODO(jaredallard): find non finished status
@@ -101,14 +101,14 @@ func (c *Client) GetEpisodes(s *providerapi.Series) ([]providerapi.Episode, erro
 
 	newEps := make([]providerapi.Episode, len(eps))
 	for i, e := range eps {
-		var firstAired *time.Time
+		var firstAired time.Time
 		if e.Attributes.Airdate != "" {
 			time, err := time.Parse("2006-01-02", e.Attributes.Airdate)
 			if err != nil {
 				continue
 			}
 
-			firstAired = &time
+			firstAired = time
 		}
 
 		synp := e.Attributes.Synopsis

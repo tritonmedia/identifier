@@ -9,6 +9,7 @@ import (
 
 	"github.com/pioz/tvdb"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/tritonmedia/identifier/pkg/providerapi"
 	api "github.com/tritonmedia/tritonmedia.go/pkg/proto"
 )
@@ -131,15 +132,15 @@ func (c *Client) GetEpisodes(series *providerapi.Series) ([]providerapi.Episode,
 			Resolution: fmt.Sprintf("%sx%s", e.ThumbHeight, e.ThumbWidth),
 		}
 
-		var firstAired *time.Time
+		var firstAired time.Time
 		if e.FirstAired != "" {
 			time, err := time.Parse("2006-01-02", e.FirstAired)
 			if err != nil {
-				// TODO(jaredallard): better parse error handling
+				logrus.Warnf("failed to parse firstAired for episode")
 				continue
 			}
 
-			firstAired = &time
+			firstAired = time
 		}
 
 		eps[i] = providerapi.Episode{
@@ -178,14 +179,14 @@ func (c *Client) GetSeries(mediaID string, strid string) (providerapi.Series, er
 		return providerapi.Series{}, errors.Wrap(err, "failed to get images")
 	}
 
-	var firstAired *time.Time
+	var firstAired time.Time
 	if s.FirstAired != "" {
 		time, err := time.Parse("2006-01-02", s.FirstAired)
 		if err != nil {
 			return providerapi.Series{}, errors.Wrap(err, "failed to parse firstAired as time")
 		}
 
-		firstAired = &time
+		firstAired = time
 	}
 
 	var status providerapi.SeriesStatus

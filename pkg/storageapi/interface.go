@@ -10,4 +10,7 @@ type Provider interface {
 
 	// NewEpisodes adds a list of episodes to the data base
 	NewEpisodes(*providerapi.Series, []providerapi.Episode) error
+
+	// NewImage creates a new image
+	NewImage(*providerapi.Series, *providerapi.Image) (string, error)
 }
