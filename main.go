@@ -5,120 +5,18 @@ import (
 	"os"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/minio/minio-go"
 	log "github.com/sirupsen/logrus"
-	"github.com/streadway/amqp"
+	"github.com/tritonmedia/identifier/events"
 	"github.com/tritonmedia/identifier/pkg/image"
 	"github.com/tritonmedia/identifier/pkg/providerapi"
 	"github.com/tritonmedia/identifier/pkg/providerapi/imdb"
 	"github.com/tritonmedia/identifier/pkg/providerapi/kitsu"
 	"github.com/tritonmedia/identifier/pkg/providerapi/tvdb"
 	"github.com/tritonmedia/identifier/pkg/rabbitmq"
-	"github.com/tritonmedia/identifier/pkg/storageapi"
 	"github.com/tritonmedia/identifier/pkg/storageapi/postgres"
 	api "github.com/tritonmedia/tritonmedia.go/pkg/proto"
 )
-
-func processor(providers map[api.Media_MetadataType]providerapi.Fetcher,
-	db storageapi.Provider,
-	idl *image.Downloader,
-	iup *image.Uploader,
-	msg amqp.Delivery) error {
-	var job api.Identify
-	if err := proto.Unmarshal(msg.Body, &job); err != nil {
-		log.WithField("event", "decode-message").Errorf("failed to unmarshal rabbitmq message into protobuf format: %v", err)
-		if err := msg.Nack(false, true); err != nil {
-			log.Warnf("failed to nack failed message: %v", err)
-		}
-		return nil
-	}
-
-	if job.Media.Id == "" {
-		log.Warnf("skipping message due to media.id not being set")
-		if err := msg.Nack(false, false); err != nil {
-			log.Warnf("failed to nack failed message: %v", err)
-		}
-		return nil
-	}
-
-	log.Infof("identifying media '%s' using provider '%s' with id '%s'", job.Media.Id, job.Media.Metadata.String(), job.Media.MetadataId)
-
-	var p providerapi.Fetcher
-	if p = providers[job.Media.Metadata]; p == nil {
-		log.Errorf("provider id '%d' (%s) is not enabled/supported", job.Media.Metadata, job.Media.Metadata.String())
-		if err := msg.Nack(false, false); err != nil {
-			log.Warnf("failed to nack failed message: %v", err)
-		}
-		return nil
-	}
-
-	s, err := p.GetSeries(job.Media.Id, job.Media.MetadataId)
-	if err != nil {
-		log.Errorf(err.Error())
-		if err := msg.Nack(false, false); err != nil {
-			log.Warnf("failed to nack failed message: %v", err)
-		}
-		return nil
-	}
-
-	e, err := p.GetEpisodes(&s)
-	if err != nil {
-		log.Errorf(err.Error())
-		if err := msg.Nack(false, false); err != nil {
-			log.Warnf("failed to nack failed message: %v", err)
-		}
-		return nil
-	}
-
-	log.Infof("got '%d' episodes for series '%s'", len(e), s.Title)
-
-	log.Infof("inserting episodes into database")
-	if err := db.NewEpisodes(&s, e); err != nil {
-		log.Errorf("failed to insert: %v", err)
-		if err := msg.Nack(false, false); err != nil {
-			log.Warnf("failed to nack failed message: %v", err)
-		}
-		return nil
-	}
-
-	log.Info("inserting images into database")
-	newImages := make([]providerapi.Image, len(s.Images))
-	for i, img := range s.Images {
-		log.Infof("downloading image '%v'", img.URL)
-		// TODO(jaredallard): upload image at this step
-		b, err := idl.DownloadImage(&img)
-		if err != nil {
-			log.Errorf("failed to process image: %v", err)
-			return nil
-		}
-
-		// TODO(jaredallard): set image ID on the actual struct?
-		log.Infof("uploading image '%v'", img.URL)
-		id, err := db.NewImage(&s, &img)
-		if err != nil {
-			log.Errorf("failed to add image to the database: %v", err)
-			return nil
-		}
-
-		if err := iup.UploadImage(s.ID, id, b, &img); err != nil {
-			log.Errorf("failed to upload image: %v", err)
-			return nil
-		}
-		newImages[i] = img
-	}
-
-	// --------
-	// ack
-	// --------
-	if err := msg.Ack(false); err != nil {
-		log.Warnf("failed to ack: %v", err)
-		return nil // explicit continue here in case anything is added below
-	}
-
-	log.Infof("successfully added into the database")
-	return nil
-}
 
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
@@ -201,13 +99,35 @@ func main() {
 	imageDownloader := image.NewDownloader()
 	imageUploader := image.NewUploader(m, "triton-media")
 
-	msgs, err := client.Consume("v1.identify")
+	conf := &events.ProcessorConfig{
+		Providers:       providers,
+		DB:              db,
+		ImageDownloader: imageDownloader,
+		ImageUploader:   imageUploader,
+	}
+	v1identify := events.NewV1IdentifyProcessor(conf)
+	v1identifynewfile := events.NewV1IdentifyNewFileProcessor(conf)
+
+	// TODO(jaredallard): pass stop chan
+	go func() {
+		msgs, err := client.Consume("v1.identify")
+		if err != nil {
+			log.Fatalf("failed to consume from queues: %v", err)
+		}
+
+		for msg := range msgs {
+			v1identify.Process(msg)
+		}
+	}()
+
+	log.WithField("event", "started").Infoln("waiting for rabbitmq messages")
+
+	msgs, err := client.Consume("v1.identify.newfile")
 	if err != nil {
 		log.Fatalf("failed to consume from queues: %v", err)
 	}
 
-	log.WithField("event", "started").Infoln("waiting for rabbitmq messages")
 	for msg := range msgs {
-		processor(providers, db, imageDownloader, imageUploader, msg)
+		v1identifynewfile.Process(msg)
 	}
 }

@@ -22,7 +22,7 @@ require (
 	github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94
 	github.com/stretchr/testify v1.3.0
 	github.com/tritonmedia/kitsu v0.2.4-0.20190811161725-5fa03d532d0f
-	github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190811003018-8f9f2b4cbb89
+	github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190817013428-8bd87217f969
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 // indirect
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect

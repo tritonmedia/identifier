@@ -30,9 +30,13 @@ gofmt:
 	gofmt -w ./
 
 # Test publising messages
-.PHONY: test-publish
-test-publish:
-	go run ./test/publish.go
+.PHONY: test-v1.identify-publish
+test-v1.identify-publish:
+	go run ./test/v1.identify-publish.go
+
+.PHONY: test-v1.identify.newfile-publish
+test-v1.identify.newfile-publish:
+	go run ./test/v1.identify.newfile-publish.go
 
 .PHONY: update-schemas
 update-schema:

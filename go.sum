@@ -72,6 +72,12 @@ github.com/tritonmedia/kitsu v0.2.4-0.20190811161725-5fa03d532d0f h1:Ehtonfj+iF8
 github.com/tritonmedia/kitsu v0.2.4-0.20190811161725-5fa03d532d0f/go.mod h1:92zYYjvnxsmFZ62tHESV9hJvN9gr5eEe5kfdLdyxE7c=
 github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190811003018-8f9f2b4cbb89 h1:7D3cOd1PiXeVTJjttAsNtUjcRO3NieP4+tCBX82y9AQ=
 github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190811003018-8f9f2b4cbb89/go.mod h1:nMLKgW2zyuRGpfDUMnS6uBv6xfFMt7jUX3chgSB1iaE=
+github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190817011533-614a420fa822 h1:t/LiEy5fbHhHQQdGWZNOzhGFikB6kZTP9CIW6mlYBmk=
+github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190817011533-614a420fa822/go.mod h1:nMLKgW2zyuRGpfDUMnS6uBv6xfFMt7jUX3chgSB1iaE=
+github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190817012109-76c251b3d238 h1:BJjz/PAI7FgkkuW+rNMWO8bguWvad+BjzAZ3r4nu8NE=
+github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190817012109-76c251b3d238/go.mod h1:nMLKgW2zyuRGpfDUMnS6uBv6xfFMt7jUX3chgSB1iaE=
+github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190817013428-8bd87217f969 h1:UKww3jRo68pN5Dpme5eRVugNTjWp1YhqfeZeXvZzaCM=
+github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190817013428-8bd87217f969/go.mod h1:nMLKgW2zyuRGpfDUMnS6uBv6xfFMt7jUX3chgSB1iaE=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 h1:HuIa8hRrWRSrqYzx1qI49NNxhdi2PrY7gxVSq1JjLDc=
 golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=

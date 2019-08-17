@@ -13,4 +13,10 @@ type Provider interface {
 
 	// NewImage creates a new image
 	NewImage(*providerapi.Series, *providerapi.Image) (string, error)
+
+	// NewEpisodeFile creates a new episode file
+	NewEpisodeFile(e *providerapi.Episode, key, quality string) (string, error)
+
+	// FindEpisodeID finds an episode's ID by episode and season number
+	FindEpisodeID(mediaID string, episode, season int) (string, error)
 }

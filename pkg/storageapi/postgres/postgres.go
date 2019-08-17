@@ -4,6 +4,7 @@ package postgres
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"io/ioutil"
 	"time"
 
@@ -87,6 +88,8 @@ func (c *Client) NewEpisodes(s *providerapi.Series, eps []providerapi.Episode) e
 			return errors.Wrap(err, "failed to generate id for episode")
 		}
 
+		e.ID = id.String()
+
 		var aired string
 		if !e.Aired.IsZero() {
 			aired = e.Aired.Format(time.RFC3339)
@@ -95,11 +98,13 @@ func (c *Client) NewEpisodes(s *providerapi.Series, eps []providerapi.Episode) e
 		}
 
 		logrus.Infof("inserting episode '%s': number=%d,air_date='%s'", id.String(), e.Number, aired)
-		tx.Exec(`
+		if _, err := tx.Exec(`
 			INSERT INTO episodes_v1 
 				(id, media_id, absolute_number, season, season_number, description, air_date)
 				VALUES ($1, $2, $3, $4, $5, $6, $7)
-		`, id.String(), s.ID, e.Number, e.Season, e.SeasonNumber, e.Overview, aired)
+		`, id.String(), s.ID, e.Number, e.Season, e.SeasonNumber, e.Overview, aired); err != nil {
+			return errors.Wrap(err, "failed to add episode")
+		}
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -123,4 +128,42 @@ func (c *Client) NewImage(s *providerapi.Series, i *providerapi.Image) (string, 
 	`, id.String(), s.ID, i.Type, i.Checksum, i.Rating, i.Resolution)
 
 	return id.String(), err
+}
+
+// NewEpisodeFile adds a new episode file
+func (c *Client) NewEpisodeFile(e *providerapi.Episode, key, quality string) (string, error) {
+	id, err := uuid.NewV4()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to generate id for episode file")
+	}
+
+	_, err = c.sql.Exec(`
+		INSERT INTO episode_files_v1
+			(id, episode_id, key, quality)
+		VALUES ($1, $2, $3, $4)
+	`, id.String(), e.ID, key, quality)
+
+	return id.String(), err
+}
+
+// FindEpisodeID returns an episode id from episode and season.
+func (c *Client) FindEpisodeID(mediaID string, episode, season int) (string, error) {
+	r, err := c.sql.Query(`
+		SELECT id FROM episodes_v1 WHERE season_number = $1 AND season = $2 AND media_id = $3 LIMIT 1
+	`, episode, season, mediaID)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to search for episode id")
+	}
+
+	r.Next()
+	vals, err := r.Values()
+	if err != nil {
+		return "", err
+	}
+
+	if len(vals) != 1 {
+		return "", fmt.Errorf("failed to find an episode matching your criteria")
+	}
+
+	return vals[0].(string), err
 }

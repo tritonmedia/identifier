@@ -70,7 +70,7 @@ type Series struct {
 	// Title of this media
 	Title string
 
-	// ID of this media
+	// ID of this media, set by identifier
 	ID string
 
 	// Provider that returned this, should match the v1.media metadata entry
@@ -115,6 +115,9 @@ type Series struct {
 // Episode is an episode of a series
 // TODO(jaredallard): provider actors on this
 type Episode struct {
+	// ID is the ID of this episode, set by identifier
+	ID string
+
 	// Number is the absolute number of a episode in a series, is not
 	// bound by the current season
 	Number int64
