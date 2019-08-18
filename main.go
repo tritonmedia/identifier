@@ -43,7 +43,7 @@ func main() {
 				Username: username,
 			})
 			if err != nil {
-				log.Errorf("failed to create tvdb provider: %v", err)
+				log.Errorf("failed to load tvdb provider: %v", err)
 				continue
 			}
 
@@ -53,6 +53,7 @@ func main() {
 		case api.Media_IMDB:
 			if clients[api.Media_TVDB] == nil {
 				log.Errorf("IMDB api wraps TVDB, and TVDB wasn't loaded, refusing to load")
+				continue
 			}
 
 			t := providers[api.Media_TVDB].(*tvdb.Client)

@@ -6,6 +6,7 @@ GOFLAGS    :=
 TAGS       := 
 BINDIR     := $(CURDIR)/bin
 PKGDIR     := github.com/tritonmedia/identifier
+CGO_ENABLED := 1
 
 # Required for globs to work correctly
 SHELL=/bin/bash
@@ -22,7 +23,7 @@ dep:
 .PHONY: build
 build:
 	@echo " ===> building releases in ./bin/... <=== "
-	CGO_ENABLED=1 $(GO) build -o $(BINDIR)/identifier -v $(GOFLAGS) -tags '$(TAGS)' -ldflags '$(LDFLAGS)' $(PKGDIR)
+	CGO_ENABLED=$(CGO_ENABLED) $(GO) build -o $(BINDIR)/identifier -v $(GOFLAGS) -tags '$(TAGS)' -ldflags '$(LDFLAGS)' $(PKGDIR)
 
 .PHONY: gofmt
 gofmt:
