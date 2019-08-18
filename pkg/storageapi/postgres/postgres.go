@@ -43,35 +43,35 @@ func NewClient() (*Client, error) {
 
 	s := string(b)
 
-	cli, err := pgx.NewConnPool(pgx.ConnPoolConfig{
-		ConnConfig: pgx.ConnConfig{
-			Host:     "127.0.0.1",
-			User:     "postgres",
-			Database: "media",
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	c := &Client{
-		sql: cli,
-	}
+	var conn *pgx.ConnPool
 
 	// TODO(jaredallard): give up eventually
 	err = backoff.Retry(func() error {
-		// check if we need to init
-		// TODO(jaredallard): we need a migration system and stuff here
-		if _, err := cli.Query("SELECT id FROM episodes_v1 LIMIT 1;"); err != nil {
-			logrus.Infof("running '%s'", s)
-			if _, err := cli.Exec(s); err != nil {
-				return errors.Wrap(err, "failed to init database")
-			}
-		}
-		return nil
+		var err error
+		conn, err = pgx.NewConnPool(pgx.ConnPoolConfig{
+			ConnConfig: pgx.ConnConfig{
+				Host:     "127.0.0.1",
+				User:     "postgres",
+				Database: "media",
+			},
+		})
+		return err
 	}, backoff.NewExponentialBackOff())
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to postgres after substantial retries")
+	}
+
+	// check if we need to init
+	// TODO(jaredallard): we need a migration system and stuff here
+	if _, err := conn.Query("SELECT id FROM episodes_v1 LIMIT 1;"); err != nil {
+		logrus.Infof("running '%s'", s)
+		if _, err := conn.Exec(s); err != nil {
+			return nil, errors.Wrap(err, "failed to init database")
+		}
+	}
+
+	c := &Client{
+		sql: conn,
 	}
 
 	return c, nil
