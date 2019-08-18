@@ -46,6 +46,7 @@ func NewClient(endpoint string) (*Client, error) {
 		conn, err = amqp.Dial(endpoint)
 		if err != nil {
 			log.Errorf("failed to dial rabbitmq: %v", err)
+			return err
 		}
 		return nil
 	}, backoff.NewExponentialBackOff())
