@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"time"
 
+	"github.com/cenkalti/backoff"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx"
 	"github.com/pkg/errors"
@@ -57,13 +58,20 @@ func NewClient() (*Client, error) {
 		sql: cli,
 	}
 
-	// check if we need to init
-	// TODO(jaredallard): we need a migration system and stuff here
-	if _, err := cli.Query("SELECT id FROM episodes_v1 LIMIT 1;"); err != nil {
-		logrus.Infof("running '%s'", s)
-		if _, err := cli.Exec(s); err != nil {
-			return nil, errors.Wrap(err, "failed to init database")
+	// TODO(jaredallard): give up eventually
+	err = backoff.Retry(func() error {
+		// check if we need to init
+		// TODO(jaredallard): we need a migration system and stuff here
+		if _, err := cli.Query("SELECT id FROM episodes_v1 LIMIT 1;"); err != nil {
+			logrus.Infof("running '%s'", s)
+			if _, err := cli.Exec(s); err != nil {
+				return errors.Wrap(err, "failed to init database")
+			}
 		}
+		return nil
+	}, backoff.NewExponentialBackOff())
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to postgres after substantial retries")
 	}
 
 	return c, nil
