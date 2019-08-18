@@ -20,7 +20,7 @@ const (
 	// Provider is the provider enum entry for this provider
 	Provider = int(api.Media_TVDB)
 
-	// ProviderImageEndpoint is the image endppint for this provider
+	// ProviderImageEndpoint is the image endpoint for this provider
 	ProviderImageEndpoint = "https://www.thetvdb.com/banners/"
 )
 
@@ -111,6 +111,15 @@ func (c *Client) getSeriesImages(seriesID int) ([]providerapi.Image, error) {
 
 // GetEpisodes returns a list of all the episodes in a series
 func (c *Client) GetEpisodes(series *providerapi.Series) ([]providerapi.Episode, error) {
+	// there are no episodes in a tv show, but we create a single -1 number episode
+	if series.Type == api.Media_MOVIE {
+		return []providerapi.Episode{
+			providerapi.Episode{
+				Number: -1,
+			},
+		}, nil
+	}
+
 	id, err := strconv.Atoi(series.ProviderID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse id")
@@ -159,7 +168,7 @@ func (c *Client) GetEpisodes(series *providerapi.Series) ([]providerapi.Episode,
 }
 
 // GetSeries returns a series
-func (c *Client) GetSeries(mediaID string, strid string) (providerapi.Series, error) {
+func (c *Client) GetSeries(mediaID string, mediaType api.Media_MediaType, strid string) (providerapi.Series, error) {
 	id, err := strconv.Atoi(strid)
 	if err != nil {
 		return providerapi.Series{}, errors.Wrap(err, "failed to parse id")
@@ -206,6 +215,7 @@ func (c *Client) GetSeries(mediaID string, strid string) (providerapi.Series, er
 
 	return providerapi.Series{
 		ID:           mediaID,
+		Type:         mediaType,
 		Title:        s.SeriesName,
 		ProviderID:   strid,
 		Provider:     Provider,

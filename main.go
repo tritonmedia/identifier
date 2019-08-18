@@ -13,6 +13,7 @@ import (
 	"github.com/tritonmedia/identifier/pkg/providerapi"
 	"github.com/tritonmedia/identifier/pkg/providerapi/imdb"
 	"github.com/tritonmedia/identifier/pkg/providerapi/kitsu"
+	"github.com/tritonmedia/identifier/pkg/providerapi/tmdb"
 	"github.com/tritonmedia/identifier/pkg/providerapi/tvdb"
 	"github.com/tritonmedia/identifier/pkg/rabbitmq"
 	"github.com/tritonmedia/identifier/pkg/storageapi/postgres"
@@ -22,7 +23,7 @@ import (
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 
-	enabledProviders := []api.Media_MetadataType{api.Media_TVDB, api.Media_IMDB, api.Media_KITSU}
+	enabledProviders := []api.Media_MetadataType{api.Media_TVDB, api.Media_TMDB, api.Media_IMDB, api.Media_KITSU}
 
 	providers := make(map[api.Media_MetadataType]providerapi.Fetcher)
 	clients := make(map[api.Media_MetadataType]interface{})
@@ -62,6 +63,17 @@ func main() {
 			provider = imdb.NewClient(t)
 		case api.Media_KITSU:
 			provider = kitsu.NewClient()
+		case api.Media_TMDB:
+			apiKey := os.Getenv(fmt.Sprintf("%s_APIKEY", envBase))
+
+			prov, err := tmdb.NewClient(apiKey)
+			if err != nil {
+				log.Errorf("failed to load tmdb provider: %v", err)
+				continue
+			}
+
+			provider = prov
+			client = prov
 		default:
 			log.Errorf("unknown media provider id %d (%s)", p, p.String())
 		}

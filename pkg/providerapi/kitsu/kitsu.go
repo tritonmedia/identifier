@@ -25,7 +25,7 @@ func NewClient() *Client {
 }
 
 // GetSeries returns a series by ID
-func (c *Client) GetSeries(mediaID, strid string) (providerapi.Series, error) {
+func (c *Client) GetSeries(mediaID string, mediaType api.Media_MediaType, strid string) (providerapi.Series, error) {
 	a, err := kitsu.GetAnime(strid)
 	if err != nil {
 		return providerapi.Series{}, errors.Wrap(err, "failed to get kitsu anime")
@@ -69,6 +69,7 @@ func (c *Client) GetSeries(mediaID, strid string) (providerapi.Series, error) {
 
 	s := providerapi.Series{
 		ID:         mediaID,
+		Type:       mediaType,
 		Title:      a.Attributes.CanonicalTitle,
 		Provider:   Provider,
 		ProviderID: strid,
@@ -94,6 +95,15 @@ func (c *Client) GetSeries(mediaID, strid string) (providerapi.Series, error) {
 
 // GetEpisodes returns episodes in a series
 func (c *Client) GetEpisodes(s *providerapi.Series) ([]providerapi.Episode, error) {
+	// there are no episodes in a tv show, but we create a single -1 number episode
+	if s.Type == api.Media_MOVIE {
+		return []providerapi.Episode{
+			providerapi.Episode{
+				Number: -1,
+			},
+		}, nil
+	}
+
 	eps, err := kitsu.GetAnimeEpisodes(s.ProviderID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get eps")

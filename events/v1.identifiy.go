@@ -50,13 +50,18 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 		return nil
 	}
 
-	s, err := prov.GetSeries(job.Media.Id, job.Media.MetadataId)
+	s, err := prov.GetSeries(job.Media.Id, job.Media.Type, job.Media.MetadataId)
 	if err != nil {
 		log.Errorf(err.Error())
 		if err := msg.Nack(false, false); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
+	}
+
+	// TODO(jaredallard): remove when we put series into the database
+	if s.ID == "" {
+		s.ID = job.Media.Id
 	}
 
 	e, err := prov.GetEpisodes(&s)
@@ -79,18 +84,17 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 		return nil
 	}
 
+	// TODO(jaredallard): upload episode images
 	log.Info("inserting images into database")
 	newImages := make([]providerapi.Image, len(s.Images))
 	for i, img := range s.Images {
 		log.Infof("downloading image '%v'", img.URL)
-		// TODO(jaredallard): upload image at this step
 		b, err := p.config.ImageDownloader.DownloadImage(&img)
 		if err != nil {
 			log.Errorf("failed to process image: %v", err)
 			return nil
 		}
 
-		// TODO(jaredallard): set image ID on the actual struct?
 		log.Infof("uploading image '%v'", img.URL)
 		id, err := p.config.DB.NewImage(&s, &img)
 		if err != nil {

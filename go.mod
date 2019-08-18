@@ -11,11 +11,13 @@ require (
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
 	github.com/jackc/pgx v3.5.0+incompatible
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/kylelemons/go-gypsy v0.0.0-20160905020020-08cad365cd28 // indirect
 	github.com/lib/pq v1.2.0 // indirect
 	github.com/minio/minio-go v6.0.14+incompatible
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9
 	github.com/pkg/errors v0.8.1
+	github.com/ryanbradynd05/go-tmdb v0.0.0-20181220020137-291a20d25ffd
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24 // indirect
 	github.com/sirupsen/logrus v1.4.2
@@ -23,7 +25,7 @@ require (
 	github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94
 	github.com/stretchr/testify v1.3.0
 	github.com/tritonmedia/kitsu v0.2.4-0.20190811161725-5fa03d532d0f
-	github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190817013428-8bd87217f969
+	github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190818155310-3262d6bf0aec
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 // indirect
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80 // indirect
 	golang.org/x/sys v0.0.0-20190606165138-5da285871e9c // indirect

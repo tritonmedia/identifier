@@ -48,7 +48,7 @@ func NewClient() (*Client, error) {
 
 	pgEndpoint := os.Getenv("IDENTIFIER_POSTGRES_ENDPOINT")
 	if pgEndpoint == "" {
-		pgEndpoint = "127.0.0l1"
+		pgEndpoint = "127.0.0.1"
 		log.Warnf("TWILIGHT_RABBITMQ_ENDPOINT not defined, defaulting to local config: %s", pgEndpoint)
 	}
 
@@ -115,7 +115,7 @@ func (c *Client) NewEpisodes(s *providerapi.Series, eps []providerapi.Episode) e
 			aired = time.Now().Format(time.RFC3339)
 		}
 
-		log.Infof("inserting episode '%s': number=%d,air_date='%s'", id.String(), e.Number, aired)
+		log.Infof("inserting episode '%s': season=%d,number=%d,season_number=%d,air_date='%s'", id.String(), e.Season, e.Number, e.SeasonNumber, aired)
 		if _, err := tx.Exec(`
 			INSERT INTO episodes_v1 
 				(id, media_id, absolute_number, season, season_number, description, air_date)

@@ -28,7 +28,7 @@ func NewClient(t *tvdb.Client) *Client {
 }
 
 // GetSeries returns a series by ID
-func (c *Client) GetSeries(mediaID, strid string) (providerapi.Series, error) {
+func (c *Client) GetSeries(mediaID string, mediaType api.Media_MediaType, strid string) (providerapi.Series, error) {
 	series, err := c.tvdb.TVDBclient.SearchByImdbID(strid)
 	if err != nil {
 		return providerapi.Series{}, errors.Wrap(err, "failed to search by imdb id")
@@ -39,7 +39,7 @@ func (c *Client) GetSeries(mediaID, strid string) (providerapi.Series, error) {
 	}
 
 	tvdbid := strconv.Itoa(series[0].ID)
-	return c.tvdb.GetSeries(mediaID, tvdbid)
+	return c.tvdb.GetSeries(mediaID, mediaType, tvdbid)
 }
 
 // GetEpisodes returns episodes in a series

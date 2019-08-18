@@ -26,7 +26,8 @@ CREATE TABLE episodes_v1 (
     season double precision NOT NULL,
     season_number double precision NOT NULL,
     created_at timestamp with time zone DEFAULT now(),
-    UNIQUE (media_id, season, season_number)
+    UNIQUE (media_id, season, season_number),
+    UNIQUE (media_id, absolute_number)
 );
 COMMENT ON COLUMN episodes_v1.id IS 'ID this episode, a UUID';
 COMMENT ON COLUMN episodes_v1.media_id IS 'ID of the media this episode belong too';

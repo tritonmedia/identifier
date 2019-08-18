@@ -1,6 +1,10 @@
 package providerapi
 
-import "time"
+import (
+	"time"
+
+	api "github.com/tritonmedia/tritonmedia.go/pkg/proto"
+)
 
 // ImageType is the type of image an image is
 type ImageType string
@@ -72,6 +76,9 @@ type Series struct {
 
 	// ID of this media, set by identifier
 	ID string
+
+	// Type of this media, set by providerapi
+	Type api.Media_MediaType
 
 	// Provider that returned this, should match the v1.media metadata entry
 	Provider int
@@ -148,7 +155,7 @@ type Episode struct {
 // metadata
 type Fetcher interface {
 	// GetSeries returns a series by provider ID
-	GetSeries(mediaID string, id string) (Series, error)
+	GetSeries(mediaID string, mediaType api.Media_MediaType, id string) (Series, error)
 
 	// GetEpisodes returns all episodes in a series, if it's a movie it should return
 	// a single episode.
