@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"strings"
 
@@ -80,13 +81,24 @@ func main() {
 	}
 
 	b := "IDENTIFIER_S3_"
+
+	var ssl bool
+	endpoint := os.Getenv(b + "ENDPOINT")
+	u, err := url.Parse(endpoint)
+	if err != nil {
+		log.Fatalf("failed to parse minio endpoint as a URL: %v", err)
+	}
+
+	if u.Scheme == "https" {
+		log.Infof("minio: enabled TLS")
+		ssl = true
+	}
+
 	m, err := minio.New(
-		os.Getenv(b+"ENDPOINT"),
+		u.Host,
 		os.Getenv(b+"ACCESS_KEY"),
 		os.Getenv(b+"SECRET_KEY"),
-
-		// TODO(jaredallard): determine from endpoint url
-		false,
+		ssl,
 	)
 
 	if _, err := m.ListBuckets(); err != nil {
