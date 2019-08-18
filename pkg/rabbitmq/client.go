@@ -7,6 +7,10 @@ import (
 	"sync"
 
 	"github.com/streadway/amqp"
+
+	log "github.com/sirupsen/logrus"
+	// don't reimplement the wheel
+	"github.com/cenkalti/backoff"
 )
 
 // Client is a RabbitMQ client
@@ -35,9 +39,18 @@ var (
 
 // NewClient returns a new rabbitmq client
 func NewClient(endpoint string) (*Client, error) {
-	conn, err := amqp.Dial(endpoint)
+	var conn *amqp.Connection
+	// TODO(jaredallard): maybe give up at a certain point?
+	err := backoff.Retry(func() error {
+		var err error
+		conn, err = amqp.Dial(endpoint)
+		if err != nil {
+			log.Errorf("failed to dial rabbitmq: %v", err)
+		}
+		return nil
+	}, backoff.NewExponentialBackOff())
 	if err != nil {
-		return nil, fmt.Errorf("Failed to dial rabbitmq: %v", err)
+		return nil, fmt.Errorf("failed to connect to rabbitmq after substantial retries")
 	}
 
 	return &Client{

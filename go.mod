@@ -3,6 +3,7 @@ module github.com/tritonmedia/identifier
 go 1.12
 
 require (
+	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/go-ini/ini v1.46.0 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
@@ -25,6 +26,8 @@ require (
 	github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190817013428-8bd87217f969
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 // indirect
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80 // indirect
+	golang.org/x/sys v0.0.0-20190606165138-5da285871e9c // indirect
+	golang.org/x/text v0.3.2 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/ini.v1 v1.46.0 // indirect
 )
