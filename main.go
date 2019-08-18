@@ -76,11 +76,13 @@ func main() {
 		log.Warnf("TWILIGHT_RABBITMQ_ENDPOINT not defined, defaulting to local config: %s", amqpEndpoint)
 	}
 
+	log.Infoln("connecting to rabbitmq ...")
 	client, err := rabbitmq.NewClient(amqpEndpoint)
 	if err != nil {
 		log.Fatalf("failed to connect to rabbitmq: %v", err)
 	}
 
+	log.Infoln("connecting to postgres ...")
 	db, err := postgres.NewClient()
 	if err != nil {
 		log.Fatalf("failed to initialize postgres: %v", err)

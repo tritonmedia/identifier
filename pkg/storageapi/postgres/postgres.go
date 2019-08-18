@@ -6,13 +6,14 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/cenkalti/backoff"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/tritonmedia/identifier/pkg/providerapi"
 	assets "github.com/tritonmedia/identifier/pkg/storageapi/postgres/schema"
@@ -45,16 +46,25 @@ func NewClient() (*Client, error) {
 
 	var conn *pgx.ConnPool
 
+	pgEndpoint := os.Getenv("IDENTIFIER_POSTGRES_ENDPOINT")
+	if pgEndpoint == "" {
+		pgEndpoint = "127.0.0l1"
+		log.Warnf("TWILIGHT_RABBITMQ_ENDPOINT not defined, defaulting to local config: %s", pgEndpoint)
+	}
+
 	// TODO(jaredallard): give up eventually
 	err = backoff.Retry(func() error {
 		var err error
 		conn, err = pgx.NewConnPool(pgx.ConnPoolConfig{
 			ConnConfig: pgx.ConnConfig{
-				Host:     "127.0.0.1",
+				Host:     pgEndpoint,
 				User:     "postgres",
 				Database: "media",
 			},
 		})
+		if err != nil {
+			log.Errorf("failed to connect to postgres: %v", err)
+		}
 		return err
 	}, backoff.NewExponentialBackOff())
 	if err != nil {
@@ -64,7 +74,7 @@ func NewClient() (*Client, error) {
 	// check if we need to init
 	// TODO(jaredallard): we need a migration system and stuff here
 	if _, err := conn.Query("SELECT id FROM episodes_v1 LIMIT 1;"); err != nil {
-		logrus.Infof("running '%s'", s)
+		log.Infof("running '%s'", s)
 		if _, err := conn.Exec(s); err != nil {
 			return nil, errors.Wrap(err, "failed to init database")
 		}
@@ -105,7 +115,7 @@ func (c *Client) NewEpisodes(s *providerapi.Series, eps []providerapi.Episode) e
 			aired = time.Now().Format(time.RFC3339)
 		}
 
-		logrus.Infof("inserting episode '%s': number=%d,air_date='%s'", id.String(), e.Number, aired)
+		log.Infof("inserting episode '%s': number=%d,air_date='%s'", id.String(), e.Number, aired)
 		if _, err := tx.Exec(`
 			INSERT INTO episodes_v1 
 				(id, media_id, absolute_number, season, season_number, description, air_date)
