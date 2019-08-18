@@ -22,9 +22,9 @@ func main() {
 		CreatedAt: time.Now().Format(time.RFC3339),
 		Media: &api.Media{
 			Id:         "xxx",
-			Metadata:   api.Media_TMDB,
-			Type:       api.Media_TV,
-			MetadataId: "246",
+			Metadata:   api.Media_IMDB,
+			Type:       api.Media_MOVIE,
+			MetadataId: "tt1727587",
 		},
 	}
 	b, err := proto.Marshal(&i)

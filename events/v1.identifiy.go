@@ -39,10 +39,11 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 		return nil
 	}
 
-	log.Infof("identifying media '%s' using provider '%s' with id '%s'", job.Media.Id, job.Media.Metadata.String(), job.Media.MetadataId)
+	log.Infof("identifying media '%s': provider=%s,provider_id=%s,type=%s", job.Media.Id, job.Media.Metadata.String(), job.Media.MetadataId, job.Media.Type.String())
 
 	var prov providerapi.Fetcher
-	if prov = p.config.Providers[job.Media.Metadata]; p == nil {
+	var ok bool
+	if prov, ok = p.config.Providers[job.Media.Metadata]; !ok {
 		log.Errorf("provider id '%d' (%s) is not enabled/supported", job.Media.Metadata, job.Media.Metadata.String())
 		if err := msg.Nack(false, false); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)

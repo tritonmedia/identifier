@@ -34,6 +34,9 @@ type image struct {
 // Client is a IMDB TVDB-wrapped client
 type Client struct {
 	t *tmdbapi.TMDb
+
+	// for IMDB provider
+	TMDBClient *tmdbapi.TMDb
 }
 
 // NewClient returns a new imdb client
@@ -47,7 +50,8 @@ func NewClient(apikey string) (*Client, error) {
 	t := tmdbapi.Init(config)
 
 	return &Client{
-		t: t,
+		t:          t,
+		TMDBClient: t,
 	}, nil
 }
 

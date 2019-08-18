@@ -23,16 +23,18 @@ import (
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 
+	if os.Getenv("IDENTIFIER_DEBUG") != "" {
+		log.SetReportCaller(true)
+	}
+
 	enabledProviders := []api.Media_MetadataType{api.Media_TVDB, api.Media_TMDB, api.Media_IMDB, api.Media_KITSU}
 
 	providers := make(map[api.Media_MetadataType]providerapi.Fetcher)
-	clients := make(map[api.Media_MetadataType]interface{})
 
 	for _, p := range enabledProviders {
 		envBase := fmt.Sprintf("IDENTIFIER_%s", strings.ToUpper(p.String()))
 
 		var provider providerapi.Fetcher
-		var client interface{}
 		switch p {
 		case api.Media_TVDB:
 			apiKey := os.Getenv(fmt.Sprintf("%s_APIKEY", envBase))
@@ -49,18 +51,22 @@ func main() {
 				continue
 			}
 
-			client = prov
 			provider = prov
 			break
 		case api.Media_IMDB:
-			if clients[api.Media_TVDB] == nil {
+			if providers[api.Media_TVDB] == nil {
 				log.Errorf("IMDB api wraps TVDB, and TVDB wasn't loaded, refusing to load")
+				continue
+			}
+			if providers[api.Media_TMDB] == nil {
+				log.Errorf("IMDB api wraps TMDB, and TMDB wasn't loaded, refusing to load")
 				continue
 			}
 
 			t := providers[api.Media_TVDB].(*tvdb.Client)
+			tmdb := providers[api.Media_TMDB].(*tmdb.Client)
 
-			provider = imdb.NewClient(t)
+			provider = imdb.NewClient(t, tmdb)
 		case api.Media_KITSU:
 			provider = kitsu.NewClient()
 		case api.Media_TMDB:
@@ -73,19 +79,17 @@ func main() {
 			}
 
 			provider = prov
-			client = prov
 		default:
 			log.Errorf("unknown media provider id %d (%s)", p, p.String())
 		}
 
-		clients[p] = client
 		providers[p] = provider
 	} // for loop end
 
 	amqpEndpoint := os.Getenv("IDENTIFIER_RABBITMQ_ENDPOINT")
 	if amqpEndpoint == "" {
 		amqpEndpoint = "amqp://user:bitnami@127.0.0.1:5672"
-		log.Warnf("TWILIGHT_RABBITMQ_ENDPOINT not defined, defaulting to local config: %s", amqpEndpoint)
+		log.Warnf("IDENTIFIER_RABBITMQ_ENDPOINT not defined, defaulting to local config: %s", amqpEndpoint)
 	}
 
 	log.Infoln("connecting to rabbitmq ...")

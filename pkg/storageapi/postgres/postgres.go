@@ -49,7 +49,7 @@ func NewClient() (*Client, error) {
 	pgEndpoint := os.Getenv("IDENTIFIER_POSTGRES_ENDPOINT")
 	if pgEndpoint == "" {
 		pgEndpoint = "127.0.0.1"
-		log.Warnf("TWILIGHT_RABBITMQ_ENDPOINT not defined, defaulting to local config: %s", pgEndpoint)
+		log.Warnf("IDENTIFIER_POSTGRES_ENDPOINT not defined, defaulting to local config: %s", pgEndpoint)
 	}
 
 	// TODO(jaredallard): give up eventually

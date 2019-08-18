@@ -17,6 +17,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9
 	github.com/pkg/errors v0.8.1
+	github.com/prometheus/common v0.6.0 // indirect
 	github.com/ryanbradynd05/go-tmdb v0.0.0-20181220020137-291a20d25ffd
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24 // indirect
@@ -28,8 +29,7 @@ require (
 	github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190818155310-3262d6bf0aec
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 // indirect
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80 // indirect
-	golang.org/x/sys v0.0.0-20190606165138-5da285871e9c // indirect
-	golang.org/x/text v0.3.2 // indirect
+	google.golang.org/appengine v1.6.1
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/ini.v1 v1.46.0 // indirect
 )
