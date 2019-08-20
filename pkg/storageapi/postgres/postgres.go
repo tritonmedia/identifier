@@ -117,6 +117,11 @@ func (c *Client) NewEpisodes(s *providerapi.Series, eps []providerapi.Episode) e
 
 		e.ID = id.String()
 
+		// we're a movie, so modify it a bit
+		if e.Number == -1 && len(eps) == 1 {
+			e.Name = s.Title
+		}
+
 		var aired string
 		if !e.Aired.IsZero() {
 			aired = e.Aired.Format(time.RFC3339)
@@ -127,9 +132,9 @@ func (c *Client) NewEpisodes(s *providerapi.Series, eps []providerapi.Episode) e
 		log.Infof("inserting episode '%s': season=%d,number=%d,season_number=%d,air_date='%s'", id.String(), e.Season, e.Number, e.SeasonNumber, aired)
 		if _, err := tx.Exec(`
 			INSERT INTO episodes_v1 
-				(id, media_id, absolute_number, season, season_number, description, air_date)
+				(id, media_id, absolute_number, season, season_number, description, title, air_date)
 				VALUES ($1, $2, $3, $4, $5, $6, $7)
-		`, id.String(), s.ID, e.Number, e.Season, e.SeasonNumber, e.Overview, aired); err != nil {
+		`, id.String(), s.ID, e.Number, e.Season, e.SeasonNumber, e.Overview, e.Name, aired); err != nil {
 			return errors.Wrap(err, "failed to add episode")
 		}
 	}

@@ -22,6 +22,7 @@ CREATE TABLE episodes_v1 (
     media_id character varying(128) NOT NULL,
     absolute_number integer NOT NULL,
     description text NOT NULL,
+    title text NOT NULL,
     air_date date,
     season double precision NOT NULL,
     season_number double precision NOT NULL,
@@ -36,6 +37,7 @@ COMMENT ON COLUMN episodes_v1.description IS 'Synopsis, or description, of this 
 COMMENT ON COLUMN episodes_v1.air_date IS 'When this episode first aired, this is only acurrate to the MM-DD-YYYY';
 COMMENT ON COLUMN episodes_v1.created_at IS 'When this episode was added';
 COMMENT ON COLUMN episodes_v1.season IS 'Season this episode was in';
+COMMENT ON COLUMN episodes_v1.title IS 'Episode title';
 COMMENT ON COLUMN episodes_v1.season_number IS 'Number this episode was in a season';
 
 --------------------
