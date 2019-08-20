@@ -133,7 +133,7 @@ func (c *Client) NewEpisodes(s *providerapi.Series, eps []providerapi.Episode) e
 		if _, err := tx.Exec(`
 			INSERT INTO episodes_v1 
 				(id, media_id, absolute_number, season, season_number, description, title, air_date)
-				VALUES ($1, $2, $3, $4, $5, $6, $7)
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		`, id.String(), s.ID, e.Number, e.Season, e.SeasonNumber, e.Overview, e.Name, aired); err != nil {
 			return errors.Wrap(err, "failed to add episode")
 		}
