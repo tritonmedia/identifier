@@ -65,6 +65,14 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 		s.ID = job.Media.Id
 	}
 
+	if err := p.config.DB.NewSeries(&s); err != nil {
+		log.Errorf(err.Error())
+		if err := msg.Nack(false, false); err != nil {
+			log.Warnf("failed to nack failed message: %v", err)
+		}
+		return nil
+	}
+
 	e, err := prov.GetEpisodes(&s)
 	if err != nil {
 		log.Errorf(err.Error())

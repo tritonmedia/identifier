@@ -15,6 +15,37 @@ COMMENT ON COLUMN episode_files_v1.quality IS 'Quality of this file, valid optio
 COMMENT ON COLUMN episode_files_v1.created_at IS 'When this file was added';
 
 --------------------
+-- SERIES DATA
+--------------------
+CREATE TABLE series_v1 (
+    id character varying(128) PRIMARY KEY REFERENCES media(id),
+    title text NOT NULL,
+    type integer NOT NULL,
+    rating double precision DEFAULT '10'::double precision,
+    overview text NOT NULL,
+    network text,
+    first_aired date NOT NULL,
+    status text NOT NULL,
+    genres text NOT NULL,
+    airs text NOT NULL,
+    air_day_of_week text NOT NULL,
+    runtime integer DEFAULT 0,
+    created_at timestamp with time zone DEFAULT now()
+);
+COMMENT ON COLUMN series_v1.id IS 'ID of the media file';
+COMMENT ON COLUMN series_v1.title IS 'Title of the Media';
+COMMENT ON COLUMN series_v1.type IS 'Type of the Media';
+COMMENT ON COLUMN series_v1.rating IS 'Rating of Media, 0-10';
+COMMENT ON COLUMN series_v1.overview IS 'Overview / description of the media';
+COMMENT ON COLUMN series_v1.network IS 'Network this media played on';
+COMMENT ON COLUMN series_v1.first_aired IS 'When this media first started airing';
+COMMENT ON COLUMN series_v1.status IS 'Status of this media, is it still airing?';
+COMMENT ON COLUMN series_v1.genres IS 'CSV list of genres this media is';
+COMMENT ON COLUMN series_v1.airs IS 'HH:MM time that this show airs';
+COMMENT ON COLUMN series_v1.air_day_of_week IS 'Day of the week this show airs';
+COMMENT ON COLUMN series_v1.runtime IS 'Runtime of this media on average';
+
+--------------------
 -- EPISODES
 --------------------
 CREATE TABLE episodes_v1 (

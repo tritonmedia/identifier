@@ -124,6 +124,9 @@ func main() {
 		os.Getenv(b+"SECRET_KEY"),
 		ssl,
 	)
+	if err != nil {
+		log.Fatalf("failed to create minio (s3) client: %v", err)
+	}
 
 	if _, err := m.ListBuckets(); err != nil {
 		log.Fatalf("failed to test s3 authentication: %v", err)

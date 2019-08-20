@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/cenkalti/backoff"
@@ -88,8 +89,16 @@ func NewClient() (*Client, error) {
 }
 
 // NewSeries creates a new series
-// TODO(jaredallard): this will be added if we ever use this for media population
 func (c *Client) NewSeries(s *providerapi.Series) error {
+	log.Infof("creating series '%s': %v", s)
+	if _, err := c.sql.Exec(`
+		INSERT INTO series_v1
+			(id, title, type, rating, overview, network, first_aired, status, genres, airs, air_day_of_week, runtime)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+	`, s.ID, s.Title, s.Type, s.Rating, s.Overview, s.Network, s.FirstAired, s.Status, strings.Join(s.Genre, ","), s.Airs, s.AirDayOfWeek, s.Runtime); err != nil {
+		return errors.Wrap(err, "failed to create series")
+	}
+
 	return nil
 }
 
