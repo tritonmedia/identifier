@@ -89,3 +89,24 @@ COMMENT ON COLUMN images_v1.image_type IS 'Type of image: background/poster';
 COMMENT ON COLUMN images_v1.rating IS 'Rating of this image, defaults to 10 if provider didnt provide one';
 COMMENT ON COLUMN images_v1.created_at IS 'When this was created';
 COMMENT ON COLUMN images_v1.resolution IS 'Media resolution, in WxH';
+
+
+-------------------
+-- EPSIODE IMAGES
+-------------------
+CREATE TABLE episode_images_v1 (
+    id character varying(128) PRIMARY KEY,
+    episode_id character varying(128) NOT NULL,
+    checksum text NOT NULL,
+    image_type text NOT NULL,
+    rating double precision NOT NULL,
+    resolution text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    UNIQUE (episode_id, checksum)
+);
+COMMENT ON COLUMN episode_images_v1.id IS 'ID of this image file';
+COMMENT ON COLUMN episode_images_v1.episode_id IS 'ID of the media this image is associated with';
+COMMENT ON COLUMN episode_images_v1.image_type IS 'Type of image: background/poster';
+COMMENT ON COLUMN episode_images_v1.rating IS 'Rating of this image, defaults to 10 if provider didnt provide one';
+COMMENT ON COLUMN episode_images_v1.resolution IS 'Media resolution, in WxH';
+COMMENT ON COLUMN episode_images_v1.created_at IS 'When this was created';

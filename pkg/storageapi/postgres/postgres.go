@@ -162,6 +162,22 @@ func (c *Client) NewImage(s *providerapi.Series, i *providerapi.Image) (string, 
 	return id.String(), err
 }
 
+// NewEpisodeImage adds a new episode image and returns the image ID
+func (c *Client) NewEpisodeImage(e *providerapi.Episode, i *providerapi.Image) (string, error) {
+	id, err := uuid.NewV4()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to generate id for image")
+	}
+
+	_, err = c.sql.Exec(`
+		INSERT INTO episode_images_v1
+			(id, episode_id, image_type, checksum, rating, resolution)
+		VALUES ($1, $2, $3, $4, $5, $6)
+	`, id.String(), e.ID, i.Type, i.Checksum, i.Rating, i.Resolution)
+
+	return id.String(), err
+}
+
 // NewEpisodeFile adds a new episode file
 func (c *Client) NewEpisodeFile(e *providerapi.Episode, key, quality string) (string, error) {
 	id, err := uuid.NewV4()

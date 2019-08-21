@@ -91,7 +91,7 @@ func (c *Client) getSeriesImages(seriesID int) ([]providerapi.Image, error) {
 		case "poster":
 			imageType = providerapi.ImagePoster
 			break
-		case "background":
+		case "fanart":
 			imageType = providerapi.ImageBackground
 		default: // skip unknown
 			continue

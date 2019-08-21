@@ -21,10 +21,10 @@ func main() {
 	i := api.Identify{
 		CreatedAt: time.Now().Format(time.RFC3339),
 		Media: &api.Media{
-			Id:         "xxx",
-			Metadata:   api.Media_IMDB,
+			Id:         "xxxy",
+			Metadata:   api.Media_TVDB,
 			Type:       api.Media_TV,
-			MetadataId: "tt0417299",
+			MetadataId: "318950",
 		},
 	}
 	b, err := proto.Marshal(&i)

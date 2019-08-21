@@ -14,6 +14,9 @@ type Provider interface {
 	// NewImage creates a new image
 	NewImage(*providerapi.Series, *providerapi.Image) (string, error)
 
+	// NewEpisodeImage creates a new image
+	NewEpisodeImage(*providerapi.Episode, *providerapi.Image) (string, error)
+
 	// NewEpisodeFile creates a new episode file
 	NewEpisodeFile(e *providerapi.Episode, key, quality string) (string, error)
 

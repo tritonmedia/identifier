@@ -94,9 +94,8 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 	}
 
 	// TODO(jaredallard): upload episode images
-	log.Info("inserting images into database")
-	newImages := make([]providerapi.Image, len(s.Images))
-	for i, img := range s.Images {
+	log.Info("inserting series images into database")
+	for _, img := range s.Images {
 		log.Infof("downloading image '%v'", img.URL)
 		b, err := p.config.ImageDownloader.DownloadImage(&img)
 		if err != nil {
@@ -115,7 +114,28 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 			log.Errorf("failed to upload image: %v", err)
 			return nil
 		}
-		newImages[i] = img
+	}
+
+	log.Info("inserting epsiode images into database")
+	for _, ep := range e {
+		log.Infof("downloading image '%v'", ep.Thumb)
+		b, err := p.config.ImageDownloader.DownloadImage(&ep.Thumb)
+		if err != nil {
+			log.Errorf("failed to process image: %v", err)
+			return nil
+		}
+
+		log.Infof("uploading image '%v'", ep.Thumb.URL)
+		id, err := p.config.DB.NewEpisodeImage(&ep, &ep.Thumb)
+		if err != nil {
+			log.Errorf("failed to add image to the database: %v", err)
+			return nil
+		}
+
+		if err := p.config.ImageUploader.UploadImage(s.ID, id, b, &ep.Thumb); err != nil {
+			log.Errorf("failed to upload image: %v", err)
+			return nil
+		}
 	}
 
 	// --------
