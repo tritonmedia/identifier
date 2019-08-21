@@ -23,8 +23,8 @@ func main() {
 		Media: &api.Media{
 			Id:         "xxx",
 			Metadata:   api.Media_IMDB,
-			Type:       api.Media_MOVIE,
-			MetadataId: "tt1727587",
+			Type:       api.Media_TV,
+			MetadataId: "tt0417299",
 		},
 	}
 	b, err := proto.Marshal(&i)
