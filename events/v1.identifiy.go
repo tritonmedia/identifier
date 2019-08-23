@@ -122,19 +122,19 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 		b, err := p.config.ImageDownloader.DownloadImage(&ep.Thumb)
 		if err != nil {
 			log.Errorf("failed to process image: %v", err)
-			return nil
+			continue
 		}
 
 		log.Infof("uploading image '%v'", ep.Thumb.URL)
 		id, err := p.config.DB.NewEpisodeImage(&ep, &ep.Thumb)
 		if err != nil {
 			log.Errorf("failed to add image to the database: %v", err)
-			return nil
+			continue
 		}
 
 		if err := p.config.ImageUploader.UploadImage(s.ID, id, b, &ep.Thumb); err != nil {
 			log.Errorf("failed to upload image: %v", err)
-			return nil
+			continue
 		}
 	}
 

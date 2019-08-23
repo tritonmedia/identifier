@@ -109,7 +109,7 @@ func (c *Client) NewEpisodes(s *providerapi.Series, eps []providerapi.Episode) e
 		return err
 	}
 
-	for _, e := range eps {
+	for i, e := range eps {
 		id, err := uuid.NewV4()
 		if err != nil {
 			return errors.Wrap(err, "failed to generate id for episode")
@@ -137,6 +137,9 @@ func (c *Client) NewEpisodes(s *providerapi.Series, eps []providerapi.Episode) e
 		`, id.String(), s.ID, e.Number, e.Season, e.SeasonNumber, e.Overview, e.Name, aired); err != nil {
 			return errors.Wrap(err, "failed to add episode")
 		}
+
+		// reflect our changes
+		eps[i] = e
 	}
 
 	if err := tx.Commit(); err != nil {
