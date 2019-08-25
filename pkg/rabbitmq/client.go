@@ -137,11 +137,14 @@ func (c *Client) Publish(topic string, body []byte) error {
 	}
 	c.rkmutex.Unlock()
 
-	return aChan.Publish(topic, rk, false, false, amqp.Publishing{
+	if err := aChan.Publish(topic, rk, false, false, amqp.Publishing{
 		DeliveryMode: amqp.Persistent,
 		ContentType:  "application/octet-stream",
 		Body:         body,
-	})
+	}); err == amqp.ErrClosed { // TODO(jaredallard): don't retry forever
+		return c.Publish(topic, body)
+	}
+	return err
 }
 
 // Consume from a RabbitMQ queue
