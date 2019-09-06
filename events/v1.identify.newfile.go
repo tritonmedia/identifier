@@ -25,8 +25,8 @@ func (p *V1IdentifyNewFileProcessor) Process(msg amqp.Delivery) error {
 	var job api.IdentifyNewFile
 	if err := proto.Unmarshal(msg.Body, &job); err != nil {
 		log.WithField("event", "decode-message").Errorf("failed to unmarshal rabbitmq message into protobuf format: %v", err)
-		if err := msg.Nack(false, true); err != nil {
-			log.Warnf("failed to nack failed message: %v", err)
+		if err := msg.Ack(false); err != nil {
+			log.Warnf("failed to ack failed message: %v", err)
 		}
 		return nil
 	}
@@ -34,9 +34,14 @@ func (p *V1IdentifyNewFileProcessor) Process(msg amqp.Delivery) error {
 	log.Infof("registering new file for media '%s': quality=%s key='%s' episode=%d season=%d", job.Media.Id, job.Quality, job.Key, job.Episode, job.Season)
 	eID, err := p.config.DB.FindEpisodeID(job.Media.Id, int(job.Episode), int(job.Season))
 	if err != nil {
+		// TODO(jaredalalrd): add support for ignoring season number if the metadata provider,
+		// such as TVDB, doesn't know of that season for some reason: i.e
+		// https://forums.thetvdb.com/viewtopic.php?t=28709
 		log.Errorf("failed to find episode id")
-		if err := msg.Nack(false, false); err != nil {
-			log.Warnf("failed to nack failed message: %v", err)
+
+		// TODO(jaredallard): add backoff or something to these
+		if err := msg.Ack(false); err != nil {
+			log.Warnf("failed to ack failed message: %v", err)
 		}
 		return nil
 	}
@@ -46,7 +51,7 @@ func (p *V1IdentifyNewFileProcessor) Process(msg amqp.Delivery) error {
 		ID: eID,
 	}, job.Key, job.Quality); err != nil {
 		log.Errorf("failed to add episode to the database: %v", err)
-		if err := msg.Nack(false, false); err != nil {
+		if err := msg.Nack(false, true); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil

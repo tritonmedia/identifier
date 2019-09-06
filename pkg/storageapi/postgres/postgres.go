@@ -205,6 +205,7 @@ func (c *Client) FindEpisodeID(mediaID string, episode, season int) (string, err
 	if err != nil {
 		return "", errors.Wrap(err, "failed to search for episode id")
 	}
+	defer r.Close()
 
 	r.Next()
 	vals, err := r.Values()

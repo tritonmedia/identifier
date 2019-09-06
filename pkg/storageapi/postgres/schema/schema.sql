@@ -1,25 +1,9 @@
 --------------------
--- EPISODE FILES
---------------------
-CREATE TABLE episode_files_v1 (
-    id character varying(128) PRIMARY KEY,
-    episode_id character varying(128) NOT NULL,
-    key text NOT NULL,
-    quality text,
-    created_at timestamp with time zone DEFAULT now()
-);
-COMMENT ON COLUMN episode_files_v1.id IS 'ID of this file';
-COMMENT ON COLUMN episode_files_v1.episode_id IS 'Episode this file is associated with';
-COMMENT ON COLUMN episode_files_v1.key IS 'S3 key of this file';
-COMMENT ON COLUMN episode_files_v1.quality IS 'Quality of this file, valid options are: 480p, 720p, 1080p, 2k, 4k';
-COMMENT ON COLUMN episode_files_v1.created_at IS 'When this file was added';
-
---------------------
 -- EPISODES
 --------------------
 CREATE TABLE episodes_v1 (
     id character varying(128) PRIMARY KEY,
-    media_id character varying(128) NOT NULL,
+    media_id character varying(128) NOT NULL REFERENCES media(id),
     absolute_number integer NOT NULL,
     description text NOT NULL,
     title text NOT NULL,
@@ -38,6 +22,22 @@ COMMENT ON COLUMN episodes_v1.created_at IS 'When this episode was added';
 COMMENT ON COLUMN episodes_v1.season IS 'Season this episode was in';
 COMMENT ON COLUMN episodes_v1.title IS 'Episode title';
 COMMENT ON COLUMN episodes_v1.season_number IS 'Number this episode was in a season';
+
+--------------------
+-- EPISODE FILES
+--------------------
+CREATE TABLE episode_files_v1 (
+    id character varying(128) PRIMARY KEY,
+    episode_id character varying(128) NOT NULL REFERENCES episodes_v1(id),
+    key text NOT NULL,
+    quality text,
+    created_at timestamp with time zone DEFAULT now()
+);
+COMMENT ON COLUMN episode_files_v1.id IS 'ID of this file';
+COMMENT ON COLUMN episode_files_v1.episode_id IS 'Episode this file is associated with';
+COMMENT ON COLUMN episode_files_v1.key IS 'S3 key of this file';
+COMMENT ON COLUMN episode_files_v1.quality IS 'Quality of this file, valid options are: 480p, 720p, 1080p, 2k, 4k';
+COMMENT ON COLUMN episode_files_v1.created_at IS 'When this file was added';
 
 --------------------
 -- SERIES DATA
@@ -75,7 +75,7 @@ COMMENT ON COLUMN series_v1.runtime IS 'Runtime of this media on average';
 --------------------
 CREATE TABLE images_v1 (
     id character varying(128) PRIMARY KEY,
-    media_id character varying(128) NOT NULL,
+    media_id character varying(128) NOT NULL REFERENCES media(id),
     checksum text NOT NULL,
     image_type text NOT NULL,
     rating float NOT NULL,
@@ -96,7 +96,7 @@ COMMENT ON COLUMN images_v1.resolution IS 'Media resolution, in WxH';
 -------------------
 CREATE TABLE episode_images_v1 (
     id character varying(128) PRIMARY KEY,
-    episode_id character varying(128) NOT NULL,
+    episode_id character varying(128) NOT NULL REFERENCES episodes_v1(id),
     checksum text NOT NULL,
     image_type text NOT NULL,
     rating double precision NOT NULL,

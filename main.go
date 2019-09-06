@@ -148,6 +148,9 @@ func main() {
 	v1identify := events.NewV1IdentifyProcessor(conf)
 	v1identifynewfile := events.NewV1IdentifyNewFileProcessor(conf)
 
+	// we are pretty network dependant and slow, so only process 5 at a time
+	client.SetPrefetch(5)
+
 	// TODO(jaredallard): pass stop chan
 	go func() {
 		msgs, err := client.Consume("v1.identify")
@@ -156,7 +159,7 @@ func main() {
 		}
 
 		for msg := range msgs {
-			v1identify.Process(msg)
+			go v1identify.Process(msg)
 		}
 	}()
 
@@ -168,6 +171,6 @@ func main() {
 	}
 
 	for msg := range msgs {
-		v1identifynewfile.Process(msg)
+		go v1identifynewfile.Process(msg)
 	}
 }

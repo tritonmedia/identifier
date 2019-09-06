@@ -33,7 +33,7 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 
 	if job.Media.Id == "" {
 		log.Warnf("skipping message due to media.id not being set")
-		if err := msg.Nack(false, false); err != nil {
+		if err := msg.Nack(false, true); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -45,7 +45,7 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 	var ok bool
 	if prov, ok = p.config.Providers[job.Media.Metadata]; !ok {
 		log.Errorf("provider id '%d' (%s) is not enabled/supported", job.Media.Metadata, job.Media.Metadata.String())
-		if err := msg.Nack(false, false); err != nil {
+		if err := msg.Nack(false, true); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -54,7 +54,7 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 	s, err := prov.GetSeries(job.Media.Id, job.Media.Type, job.Media.MetadataId)
 	if err != nil {
 		log.Errorf(err.Error())
-		if err := msg.Nack(false, false); err != nil {
+		if err := msg.Nack(false, true); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -67,7 +67,9 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 
 	if err := p.config.DB.NewSeries(&s); err != nil {
 		log.Errorf(err.Error())
-		if err := msg.Nack(false, false); err != nil {
+
+		// TODO(jaredallard): better error handling
+		if err := msg.Ack(false); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -76,7 +78,7 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 	e, err := prov.GetEpisodes(&s)
 	if err != nil {
 		log.Errorf(err.Error())
-		if err := msg.Nack(false, false); err != nil {
+		if err := msg.Nack(false, true); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -87,7 +89,9 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 	log.Infof("inserting episodes into database")
 	if err := p.config.DB.NewEpisodes(&s, e); err != nil {
 		log.Errorf("failed to insert: %v", err)
-		if err := msg.Nack(false, false); err != nil {
+
+		// TODO(jaredallard): better error handling
+		if err := msg.Ack(false); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil

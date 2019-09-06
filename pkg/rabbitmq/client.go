@@ -27,6 +27,9 @@ type Client struct {
 
 	// rk modification mutex
 	rkmutex sync.Mutex
+
+	// prefetch
+	prefetch int64
 }
 
 var (
@@ -57,6 +60,7 @@ func NewClient(endpoint string) (*Client, error) {
 	return &Client{
 		lastPublishRk:     make(map[string]int),
 		connection:        conn,
+		prefetch:          10,
 		numConsumerQueues: 2,
 	}, nil
 }
@@ -98,7 +102,11 @@ func (c *Client) ensureConsumerQueues(topic string) error {
 
 // getChannel creates a new channel
 func (c *Client) getChannel() (*amqp.Channel, error) {
-	return c.connection.Channel()
+	channel, err := c.connection.Channel()
+	if channel != nil {
+		channel.Qos(int(c.prefetch), 0, true)
+	}
+	return channel, err
 }
 
 // Channel returns a raw RabbitMQ channel
@@ -109,6 +117,11 @@ func (c *Client) Channel() (*amqp.Channel, error) {
 // getRK gets the expected queue and rk name for a numberic consumer
 func (c *Client) getRk(topic string, rkIndex int) string {
 	return fmt.Sprintf("%s-%d", topic, rkIndex)
+}
+
+// SetPrefetch updates the prefetch of our channels
+func (c *Client) SetPrefetch(prefetch int64) {
+	c.prefetch = prefetch
 }
 
 // Publish a message to an exchange, must be a serialized format

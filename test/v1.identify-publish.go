@@ -24,7 +24,7 @@ func main() {
 			Id:         "xxxy",
 			Metadata:   api.Media_TVDB,
 			Type:       api.Media_TV,
-			MetadataId: "318950",
+			MetadataId: "74852",
 		},
 	}
 	b, err := proto.Marshal(&i)
