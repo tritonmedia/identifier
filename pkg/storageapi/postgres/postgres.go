@@ -328,7 +328,7 @@ func (c *Client) NewSubtitle(s *providerapi.Series, e *providerapi.Episode, sub 
 		return "", "", errors.Wrap(err, "failed to generate id for episode file")
 	}
 
-	key := fmt.Sprintf("subtitles/%s/%s/%s.%s", s.ID, e.ID, id.String(), sub.SubFormat)
+	key := fmt.Sprintf("subtitles/%s/%s/%s.srt", s.ID, e.ID, id.String())
 
 	_, err = c.sql.Exec(`
 		INSERT INTO subtitles_v1

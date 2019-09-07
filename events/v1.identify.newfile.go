@@ -1,9 +1,12 @@
 package events
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"strconv"
 
+	astisub "github.com/asticode/go-astisub"
 	"github.com/golang/protobuf/proto"
 	"github.com/minio/minio-go"
 	"github.com/oz/osdb"
@@ -92,6 +95,26 @@ func (p *V1IdentifyNewFileProcessor) downloadSubtitles(s *providerapi.Series, e 
 		return errors.Wrap(err, "failed to get subtitle reader from dl")
 	}
 
+	var subtitleReader io.Reader
+	switch subtitle.SubFormat {
+	case "srt":
+		subtitleReader = reader
+		break
+	case "ass", "ssa":
+		log.Infof("converting SSA/ASS to SRT")
+		buf := &bytes.Buffer{}
+		c, err := astisub.ReadFromSSA(reader)
+		if err != nil {
+			return errors.Wrap(err, "failed to convert from SSA/ASS to SRT")
+		}
+		if err := c.WriteToSRT(buf); err != nil {
+			return errors.Wrap(err, "failed to convert from SSA/ASS to SRT")
+		}
+		subtitleReader = buf
+	default:
+		return fmt.Errorf("unsupported subtitle format '%s'", subtitle.SubFormat)
+	}
+
 	_, subKey, err := p.config.DB.NewSubtitle(s, e, subtitle)
 	if err != nil {
 		return errors.Wrap(err, "failed to create db entry for subtitle")
@@ -99,7 +122,7 @@ func (p *V1IdentifyNewFileProcessor) downloadSubtitles(s *providerapi.Series, e 
 
 	// TODO(jaredallard): don't hardcode bucket here
 	// subtitles/<media-id>/<episode-id>/<subtitle-id>.<ext>
-	if _, err := p.config.S3Client.PutObject("triton-media", subKey, reader, -1, minio.PutObjectOptions{}); err != nil {
+	if _, err := p.config.S3Client.PutObject("triton-media", subKey, subtitleReader, -1, minio.PutObjectOptions{}); err != nil {
 		return err
 	}
 

@@ -22,8 +22,8 @@ func main() {
 		CreatedAt: time.Now().Format(time.RFC3339),
 		Quality:   "1080p",
 		Key:       "tv/Konosuba/Konosuba S1E2.mkv",
-		Episode:   1,
-		Season:    2,
+		Episode:   15,
+		Season:    1,
 		Media: &api.Media{
 			Id: "xxx",
 		},
