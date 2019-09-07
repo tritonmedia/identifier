@@ -209,7 +209,10 @@ func (c *Client) FindEpisodeID(mediaID string, episode, season int) (string, err
 	}
 	defer r.Close()
 
-	r.Next()
+	if !r.Next() {
+		return "", fmt.Errorf("failed to find an episode matching your criteria")
+	}
+
 	vals, err := r.Values()
 	if err != nil {
 		return "", err
@@ -236,7 +239,9 @@ func (c *Client) GetSeriesByID(mediaID string) (providerapi.Series, error) {
 	}
 	defer r.Close()
 
-	r.Next()
+	if !r.Next() {
+		return providerapi.Series{}, fmt.Errorf("failed to find a series matching provided id")
+	}
 
 	var id string
 	var title string
@@ -257,10 +262,6 @@ func (c *Client) GetSeriesByID(mediaID string) (providerapi.Series, error) {
 		&genres, &airs, &airDayOfWeek, &runtime,
 	); err != nil {
 		return providerapi.Series{}, err
-	}
-
-	if id == "" {
-		return providerapi.Series{}, fmt.Errorf("failed to find an series matching provided id")
 	}
 
 	return providerapi.Series{
@@ -288,11 +289,13 @@ func (c *Client) GetEpisodeByID(s *providerapi.Series, episodeID string) (provid
 		FROM episodes_v1 WHERE id = $1 AND media_id = $2 LIMIT 1
 	`, episodeID, s.ID)
 	if err != nil {
-		return providerapi.Episode{}, errors.Wrap(err, "failed to search for series id")
+		return providerapi.Episode{}, errors.Wrap(err, "failed to search for episode id")
 	}
 	defer r.Close()
 
-	r.Next()
+	if !r.Next() {
+		return providerapi.Episode{}, fmt.Errorf("failed to find episode with that id")
+	}
 
 	var absoluteNumber int64
 	var overview string

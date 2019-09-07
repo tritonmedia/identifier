@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"time"
 
 	astisub "github.com/asticode/go-astisub"
 	"github.com/golang/protobuf/proto"
@@ -145,8 +146,11 @@ func (p *V1IdentifyNewFileProcessor) Process(msg amqp.Delivery) error {
 	s, err := p.config.DB.GetSeriesByID(job.Media.Id)
 	if err != nil {
 		log.Errorf("failed to find series by id: %v", err)
-		// TODO(jaredallard): add backoff or something to these
-		if err := msg.Ack(false); err != nil {
+
+		// TODO(jaredallard): don't do this here
+		time.Sleep(10 * time.Second)
+
+		if err := msg.Nack(false, true); err != nil {
 			log.Warnf("failed to ack failed message: %v", err)
 		}
 		return nil
@@ -160,8 +164,10 @@ func (p *V1IdentifyNewFileProcessor) Process(msg amqp.Delivery) error {
 		// https://forums.thetvdb.com/viewtopic.php?t=28709
 		log.Errorf("failed to find episode id: %v", err)
 
-		// TODO(jaredallard): add backoff or something to these
-		if err := msg.Ack(false); err != nil {
+		// TODO(jaredallard): don't do this here
+		time.Sleep(10 * time.Second)
+
+		if err := msg.Nack(false, true); err != nil {
 			log.Warnf("failed to ack failed message: %v", err)
 		}
 		return nil
