@@ -21,7 +21,7 @@ func main() {
 	i := api.Identify{
 		CreatedAt: time.Now().Format(time.RFC3339),
 		Media: &api.Media{
-			Id:         "xxxy",
+			Id:         "xxx",
 			Metadata:   api.Media_TVDB,
 			Type:       api.Media_TV,
 			MetadataId: "74852",

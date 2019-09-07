@@ -110,3 +110,21 @@ COMMENT ON COLUMN episode_images_v1.image_type IS 'Type of image: background/pos
 COMMENT ON COLUMN episode_images_v1.rating IS 'Rating of this image, defaults to 10 if provider didnt provide one';
 COMMENT ON COLUMN episode_images_v1.resolution IS 'Media resolution, in WxH';
 COMMENT ON COLUMN episode_images_v1.created_at IS 'When this was created';
+
+-----------------
+-- SUBTITLES
+-----------------
+
+CREATE TABLE subtitles_v1 (
+    id character varying(128) PRIMARY KEY,
+    episode_id character varying(128) NOT NULL REFERENCES episodes_v1(id),
+    key text NOT NULL,
+    language text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    UNIQUE (episode_id, language)
+);
+COMMENT ON COLUMN subtitles_v1.id IS 'ID of this subtitle';
+COMMENT ON COLUMN subtitles_v1.episode_id IS 'Episode this subtitle is associated with';
+COMMENT ON COLUMN subtitles_v1.key IS 'S3 key of this subtitle';
+COMMENT ON COLUMN subtitles_v1.language IS 'Language of this subtitle';
+COMMENT ON COLUMN subtitles_v1.created_at IS 'When this subtitle was added';

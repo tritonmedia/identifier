@@ -13,11 +13,13 @@ import (
 	"github.com/cenkalti/backoff"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx"
+	"github.com/oz/osdb"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/tritonmedia/identifier/pkg/providerapi"
 	assets "github.com/tritonmedia/identifier/pkg/storageapi/postgres/schema"
+	api "github.com/tritonmedia/tritonmedia.go/pkg/proto"
 )
 
 // Client is a postgres client
@@ -218,4 +220,121 @@ func (c *Client) FindEpisodeID(mediaID string, episode, season int) (string, err
 	}
 
 	return vals[0].(string), err
+}
+
+// GetSeriesByID returns a series by ID
+func (c *Client) GetSeriesByID(mediaID string) (providerapi.Series, error) {
+	r, err := c.sql.Query(`
+		SELECT 
+			id, title, type, rating, overview,
+			network, first_aired, status, genres, 
+			airs, air_day_of_week, runtime
+		FROM series_v1 WHERE id = $1 LIMIT 1
+	`, mediaID)
+	if err != nil {
+		return providerapi.Series{}, errors.Wrap(err, "failed to search for series id")
+	}
+	defer r.Close()
+
+	r.Next()
+
+	var id string
+	var title string
+	var mediaType api.Media_MediaType
+	var rating float32
+	var overview string
+	var network string
+	var firstAired time.Time
+	var status providerapi.SeriesStatus
+	var genres string
+	var airs string
+	var airDayOfWeek string
+	var runtime int
+
+	if err := r.Scan(
+		&id, &title, &mediaType, &rating,
+		&overview, &network, &firstAired, &status,
+		&genres, &airs, &airDayOfWeek, &runtime,
+	); err != nil {
+		return providerapi.Series{}, err
+	}
+
+	if id == "" {
+		return providerapi.Series{}, fmt.Errorf("failed to find an series matching provided id")
+	}
+
+	return providerapi.Series{
+		ID:           id,
+		Title:        title,
+		Type:         mediaType,
+		Rating:       rating,
+		Overview:     overview,
+		Network:      network,
+		FirstAired:   firstAired,
+		Status:       status,
+		Genre:        strings.Split(genres, ","),
+		Airs:         airs,
+		AirDayOfWeek: airDayOfWeek,
+		Runtime:      runtime,
+	}, err
+}
+
+// GetEpisodeByID returns an episode by ID
+func (c *Client) GetEpisodeByID(s *providerapi.Series, episodeID string) (providerapi.Episode, error) {
+	r, err := c.sql.Query(`
+		SELECT 
+			absolute_number, description, title,
+			season, season_number, air_date
+		FROM episodes_v1 WHERE id = $1 AND media_id = $2 LIMIT 1
+	`, episodeID, s.ID)
+	if err != nil {
+		return providerapi.Episode{}, errors.Wrap(err, "failed to search for series id")
+	}
+	defer r.Close()
+
+	r.Next()
+
+	var absoluteNumber int64
+	var overview string
+	var title string
+	var season int
+	var seasonNumber int64
+	var airDate time.Time
+
+	if err := r.Scan(
+		&absoluteNumber, &overview, &title,
+		&season, &seasonNumber, &airDate,
+	); err != nil {
+		return providerapi.Episode{}, err
+	}
+
+	return providerapi.Episode{
+		ID:           episodeID,
+		Number:       absoluteNumber,
+		Overview:     overview,
+		Name:         title,
+		Season:       season,
+		SeasonNumber: seasonNumber,
+		Aired:        airDate,
+	}, err
+}
+
+// NewSubtitle creates a new subtitle
+// returns subtitle id and key
+// TODO(jaredallard): create providerapi.Subtitle
+func (c *Client) NewSubtitle(s *providerapi.Series, e *providerapi.Episode, sub *osdb.Subtitle) (string, string, error) {
+	id, err := uuid.NewV4()
+	if err != nil {
+		return "", "", errors.Wrap(err, "failed to generate id for episode file")
+	}
+
+	key := fmt.Sprintf("subtitles/%s/%s/%s.%s", s.ID, e.ID, id.String(), sub.SubFormat)
+
+	_, err = c.sql.Exec(`
+		INSERT INTO subtitles_v1
+			(id, episode_id, key, language)
+		VALUES ($1, $2, $3, $4)
+	`, id.String(), e.ID, key, sub.SubLanguageID)
+
+	return id.String(), key, err
 }

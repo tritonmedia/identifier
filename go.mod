@@ -10,10 +10,12 @@ require (
 	github.com/golang/protobuf v1.3.2
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
 	github.com/jackc/pgx v3.5.0+incompatible
+	github.com/kolo/xmlrpc v0.0.0-20190717152603-07c4ee3fd181 // indirect
 	github.com/kylelemons/go-gypsy v0.0.0-20160905020020-08cad365cd28 // indirect
 	github.com/lib/pq v1.2.0 // indirect
 	github.com/minio/minio-go v6.0.14+incompatible
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
+	github.com/oz/osdb v0.0.0-20190204162748-da06ada9cdc1
 	github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9
 	github.com/pkg/errors v0.8.1
 	github.com/prometheus/common v0.6.0 // indirect

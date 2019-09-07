@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/minio/minio-go"
+	"github.com/oz/osdb"
 	log "github.com/sirupsen/logrus"
 	"github.com/tritonmedia/identifier/events"
 	"github.com/tritonmedia/identifier/pkg/image"
@@ -135,6 +136,21 @@ func main() {
 	if err := m.MakeBucket("triton-media", "us-west-2"); err != nil {
 		log.Warnf("failed to make bucket: %v", err)
 	}
+	log.Infoln("connected to s3-compatible storage")
+
+	oc, err := osdb.NewClient()
+	if err != nil {
+		log.Fatalf("failed to create osdb client: %v", err)
+	}
+
+	oc.UserAgent = "TemporaryUserAgent"
+
+	// TODO(jaredallard): support for multiple different languages
+	if err := oc.LogIn(os.Getenv("OSDB_USERNAME"), os.Getenv("OSDB_PASSWORD"), "eng"); err != nil {
+		log.Fatalf("failed to login to opensubtitles: %v", err)
+	}
+
+	log.Infoln("connected to opensubtitles (osdb)")
 
 	imageDownloader := image.NewDownloader()
 	imageUploader := image.NewUploader(m, "triton-media")
@@ -144,6 +160,8 @@ func main() {
 		DB:              db,
 		ImageDownloader: imageDownloader,
 		ImageUploader:   imageUploader,
+		OSDB:            oc,
+		S3Client:        m,
 	}
 	v1identify := events.NewV1IdentifyProcessor(conf)
 	v1identifynewfile := events.NewV1IdentifyNewFileProcessor(conf)

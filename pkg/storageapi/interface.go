@@ -1,6 +1,9 @@
 package storageapi
 
-import "github.com/tritonmedia/identifier/pkg/providerapi"
+import (
+	"github.com/oz/osdb"
+	"github.com/tritonmedia/identifier/pkg/providerapi"
+)
 
 // Provider is an interface for storage providers to implement
 type Provider interface {
@@ -22,4 +25,13 @@ type Provider interface {
 
 	// FindEpisodeID finds an episode's ID by episode and season number
 	FindEpisodeID(mediaID string, episode, season int) (string, error)
+
+	// GetSeriesByID returns a series by ID
+	GetSeriesByID(mediaID string) (providerapi.Series, error)
+
+	// GetEpisodeByID returns an episode by ID
+	GetEpisodeByID(s *providerapi.Series, episodeID string) (providerapi.Episode, error)
+
+	// NewSubtitle creates a new subtitle
+	NewSubtitle(s *providerapi.Series, e *providerapi.Episode, sub *osdb.Subtitle) (string, string, error)
 }
