@@ -31,7 +31,8 @@ CREATE TABLE episode_files_v1 (
     episode_id character varying(128) NOT NULL REFERENCES episodes_v1(id),
     key text NOT NULL,
     quality text,
-    created_at timestamp with time zone DEFAULT now()
+    created_at timestamp with time zone DEFAULT now(),
+    UNIQUE (episode_id, key, quality)
 );
 COMMENT ON COLUMN episode_files_v1.id IS 'ID of this file';
 COMMENT ON COLUMN episode_files_v1.episode_id IS 'Episode this file is associated with';

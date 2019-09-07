@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 	"time"
 
 	astisub "github.com/asticode/go-astisub"
 	"github.com/golang/protobuf/proto"
 	"github.com/minio/minio-go"
-	"github.com/oz/osdb"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
@@ -32,12 +32,14 @@ func NewV1IdentifyNewFileProcessor(c *ProcessorConfig) *V1IdentifyNewFileProcess
 
 // downloadSubtitles downloads subtitles for a given episode
 // TODO(jaredallard): add support for REST api and mayber other subtitle providers
+// TODO(jaredallard): cache query results to use less api calls
 func (p *V1IdentifyNewFileProcessor) downloadSubtitles(s *providerapi.Series, e *providerapi.Episode) error {
+	query := s.Title
 	params := []interface{}{ // why is XML fucking like this
 		p.config.OSDB.Token,
 		[]interface{}{
 			map[string]string{
-				"query":         "avatar the last airbender",
+				"query":         query,
 				"sublanguageid": "eng",
 				"episode":       strconv.Itoa(int(e.SeasonNumber)),
 				"season":        strconv.Itoa(e.Season),
@@ -45,37 +47,21 @@ func (p *V1IdentifyNewFileProcessor) downloadSubtitles(s *providerapi.Series, e 
 		},
 	}
 
-	log.Infof("searching osdb for '%s'", s.Title, p.config.OSDB.Token)
+	log.Infof("searching osdb for '%s'", query)
 	subs, err := p.config.OSDB.SearchSubtitles(&params)
-	if err != nil {
-		return errors.Wrapf(err, "failed to search for subtitles with query '%s'", s.Title)
+	if err != nil && strings.Contains(err.Error(), "429") {
+		log.Warnf("handling 429...")
+		time.Sleep(5 * time.Second)
+		return p.downloadSubtitles(s, e)
+	} else if err != nil {
+		return errors.Wrapf(err, "failed to search for subtitles with query '%s'", query)
 	}
 
-	var subtitle *osdb.Subtitle
-	for i, sub := range subs {
-		subSeason, err := strconv.Atoi(sub.SeriesSeason)
-		if err != nil {
-			log.Warnf("not considering non-int season %s", sub.SeriesSeason)
-			continue
-		}
-
-		subEpisode, err := strconv.Atoi(sub.SeriesEpisode)
-		if err != nil {
-			log.Warnf("not considering non-int season %s", sub.SeriesSeason)
-			continue
-		}
-
-		log.Infof("found subtitle: season=%d,episode=%d want season=%d,episode=%d", subSeason, subEpisode, e.Season, e.SeasonNumber)
-
-		if subSeason == e.Season && int64(subEpisode) == e.SeasonNumber {
-			subtitle = &subs[i]
-			break
-		}
+	if len(subs) == 0 {
+		return fmt.Errorf("failed to find any subtitles with query '%s'", query)
 	}
 
-	if subtitle == nil {
-		return fmt.Errorf("failed to find any subtitles with query '%s'", s.Title)
-	}
+	subtitle := subs[0]
 
 	subtitleID, err := strconv.Atoi(subtitle.IDSubtitleFile)
 	if err != nil {
@@ -83,7 +69,11 @@ func (p *V1IdentifyNewFileProcessor) downloadSubtitles(s *providerapi.Series, e 
 	}
 
 	files, err := p.config.OSDB.DownloadSubtitlesByIds([]int{subtitleID})
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "429") {
+		log.Warnf("handling 429...")
+		time.Sleep(5 * time.Second)
+		return p.downloadSubtitles(s, e)
+	} else if err != nil {
 		return errors.Wrap(err, "failed to download subtitle")
 	}
 
@@ -117,7 +107,7 @@ func (p *V1IdentifyNewFileProcessor) downloadSubtitles(s *providerapi.Series, e 
 		return fmt.Errorf("unsupported subtitle format '%s'", subtitle.SubFormat)
 	}
 
-	_, subKey, err := p.config.DB.NewSubtitle(s, e, subtitle)
+	_, subKey, err := p.config.DB.NewSubtitle(s, e, &subtitle)
 	if err != nil {
 		return errors.Wrap(err, "failed to create db entry for subtitle")
 	}
