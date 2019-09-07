@@ -94,6 +94,7 @@ func (p *V1IdentifyNewFileProcessor) downloadSubtitles(s *providerapi.Series, e 
 	if err != nil {
 		return errors.Wrap(err, "failed to get subtitle reader from dl")
 	}
+	defer reader.Close()
 
 	var subtitleReader io.Reader
 	switch subtitle.SubFormat {
