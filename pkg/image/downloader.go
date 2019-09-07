@@ -2,18 +2,15 @@
 package image
 
 import (
-	"bytes"
 	"fmt"
 	"hash/crc64"
-	"image"
-	"image/jpeg"
-	"image/png"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 
 	"github.com/pkg/errors"
 	"github.com/tritonmedia/identifier/pkg/providerapi"
+	"gopkg.in/h2non/bimg.v1"
 )
 
 // Downloader is an image downloader that is content aware
@@ -44,33 +41,28 @@ func (d *Downloader) DownloadImage(i *providerapi.Image) (*[]byte, error) {
 
 	contentType := http.DetectContentType(b)
 
-	data := make([]byte, 0)
+	var data []byte
 
 	switch contentType {
 	case "image/png":
 		data = b
 	case "image/jpeg":
-		img, err := jpeg.Decode(bytes.NewReader(b))
+		img, err := bimg.NewImage(b).Convert(bimg.PNG)
 		if err != nil {
-			return nil, errors.Wrap(err, "unable to decode jpeg")
+			return nil, errors.Wrap(err, "unable to convert jpeg to png")
 		}
 
-		buf := new(bytes.Buffer)
-		if err := png.Encode(buf, img); err != nil {
-			return nil, errors.Wrap(err, "unable to encode png")
-		}
-
-		data = buf.Bytes()
+		data = img
 	default:
 		return nil, fmt.Errorf("unsupported image protocol %v", contentType)
 	}
 
-	img, _, err := image.DecodeConfig(bytes.NewReader(data))
+	size, err := bimg.NewImage(data).Size()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get dimensions")
 	}
 
-	i.Resolution = fmt.Sprintf("%dx%d", img.Width, img.Height)
+	i.Resolution = fmt.Sprintf("%dx%d", size.Width, size.Height)
 
 	ci := crc64.Checksum(data, d.crctable)
 	i.Checksum = strconv.FormatUint(ci, 16)

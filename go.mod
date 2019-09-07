@@ -38,5 +38,6 @@ require (
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80 // indirect
 	golang.org/x/sys v0.0.0-20190904154756-749cb33beabd // indirect
 	golang.org/x/text v0.3.2 // indirect
+	gopkg.in/h2non/bimg.v1 v1.0.19
 	gopkg.in/ini.v1 v1.46.0 // indirect
 )

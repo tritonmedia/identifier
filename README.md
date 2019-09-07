@@ -11,6 +11,18 @@ Identifier identifies media using a metadata provider such as; TVDB, Kitsu, IMDB
 
 Identifier recieves jobs over AMQP to identify media then stores that inside PostgreSQL.
 
+## Building
+
+This uses libvips which requires vips to be installed.
+
+### Mac OSX
+
+```bash
+$ brew install pkg-config vips libffi
+$ export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
+... regular commands
+```
+
 ## License
 
 Apache-2.0

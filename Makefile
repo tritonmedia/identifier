@@ -7,6 +7,7 @@ TAGS       :=
 BINDIR     := $(CURDIR)/bin
 PKGDIR     := github.com/tritonmedia/identifier
 CGO_ENABLED := 1
+CGO_CFLAGS_ALLOW := -Xpreprocessor
 
 # Required for globs to work correctly
 SHELL=/bin/bash
@@ -18,12 +19,12 @@ all: build
 .PHONY: dep
 dep:
 	@echo " ===> Installing dependencies via '$$(awk '{ print $$1 }' <<< "$(PKG)" )' <=== "
-	@$(PKG)
+	@CGO_CFLAGS_ALLOW=$(CGO_CFLAGS_ALLOW) $(PKG)
 
 .PHONY: build
 build:
 	@echo " ===> building releases in ./bin/... <=== "
-	CGO_ENABLED=$(CGO_ENABLED) $(GO) build -o $(BINDIR)/identifier -v $(GOFLAGS) -tags '$(TAGS)' -ldflags '$(LDFLAGS)' $(PKGDIR)
+	CGO_CFLAGS_ALLOW=$(CGO_CFLAGS_ALLOW) CGO_ENABLED=$(CGO_ENABLED) $(GO) build -o $(BINDIR)/identifier -v $(GOFLAGS) -tags '$(TAGS)' -ldflags '$(LDFLAGS)' $(PKGDIR)
 
 .PHONY: gofmt
 gofmt:

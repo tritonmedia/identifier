@@ -45,7 +45,7 @@ func (p *V1IdentifyNewFileProcessor) downloadSubtitles(s *providerapi.Series, e 
 		},
 	}
 
-	log.Infof("searching osdb for '%s' (token %s)", s.Title, p.config.OSDB.Token)
+	log.Infof("searching osdb for '%s'", s.Title, p.config.OSDB.Token)
 	subs, err := p.config.OSDB.SearchSubtitles(&params)
 	if err != nil {
 		return errors.Wrapf(err, "failed to search for subtitles with query '%s'", s.Title)
@@ -198,7 +198,6 @@ func (p *V1IdentifyNewFileProcessor) Process(msg amqp.Delivery) error {
 	log.Infof("searching for subtitles for this episode")
 	if err := p.downloadSubtitles(&s, &e); err != nil {
 		log.Warnf("failed to download subtitles: %v", err)
-		return nil
 	}
 
 	// --------
