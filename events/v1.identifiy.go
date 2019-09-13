@@ -3,8 +3,8 @@ package events
 import (
 	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
-	"github.com/streadway/amqp"
 	"github.com/tritonmedia/identifier/pkg/providerapi"
+	"github.com/tritonmedia/identifier/pkg/rabbitmq"
 	api "github.com/tritonmedia/tritonmedia.go/pkg/proto"
 )
 
@@ -21,11 +21,11 @@ func NewV1IdentifyProcessor(conf *ProcessorConfig) *V1IdentifyProcessor {
 }
 
 // Process processes an AMQP message
-func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
+func (p *V1IdentifyProcessor) Process(msg *rabbitmq.Delivery) error {
 	var job api.Identify
-	if err := proto.Unmarshal(msg.Body, &job); err != nil {
+	if err := proto.Unmarshal(msg.Delivery.Body, &job); err != nil {
 		log.WithField("event", "decode-message").Errorf("failed to unmarshal rabbitmq message into protobuf format: %v", err)
-		if err := msg.Nack(false, true); err != nil {
+		if err := msg.Nack(); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -33,7 +33,7 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 
 	if job.Media.Id == "" {
 		log.Warnf("skipping message due to media.id not being set")
-		if err := msg.Nack(false, true); err != nil {
+		if err := msg.Nack(); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -45,7 +45,7 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 	var ok bool
 	if prov, ok = p.config.Providers[job.Media.Metadata]; !ok {
 		log.Errorf("provider id '%d' (%s) is not enabled/supported", job.Media.Metadata, job.Media.Metadata.String())
-		if err := msg.Nack(false, true); err != nil {
+		if err := msg.Nack(); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -54,7 +54,7 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 	s, err := prov.GetSeries(job.Media.Id, job.Media.Type, job.Media.MetadataId)
 	if err != nil {
 		log.Errorf(err.Error())
-		if err := msg.Nack(false, true); err != nil {
+		if err := msg.Nack(); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -69,7 +69,7 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 		log.Errorf(err.Error())
 
 		// TODO(jaredallard): better error handling
-		if err := msg.Ack(false); err != nil {
+		if err := msg.Ack(); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -78,7 +78,7 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 	e, err := prov.GetEpisodes(&s)
 	if err != nil {
 		log.Errorf(err.Error())
-		if err := msg.Nack(false, true); err != nil {
+		if err := msg.Nack(); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -91,7 +91,7 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 		log.Errorf("failed to insert: %v", err)
 
 		// TODO(jaredallard): better error handling
-		if err := msg.Ack(false); err != nil {
+		if err := msg.Ack(); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -145,7 +145,7 @@ func (p *V1IdentifyProcessor) Process(msg amqp.Delivery) error {
 	// --------
 	// ack
 	// --------
-	if err := msg.Ack(false); err != nil {
+	if err := msg.Ack(); err != nil {
 		log.Warnf("failed to ack: %v", err)
 		return nil // explicit continue here in case anything is added below
 	}

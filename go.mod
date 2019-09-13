@@ -33,7 +33,7 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/tritonmedia/jikan-go v0.0.0-20190825200127-0974c3ed2c8c
 	github.com/tritonmedia/kitsu v0.2.4-0.20190811161725-5fa03d532d0f
-	github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190818155310-3262d6bf0aec
+	github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190912233825-4610fe4ce16e
 	golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472 // indirect
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80 // indirect
 	golang.org/x/sys v0.0.0-20190904154756-749cb33beabd // indirect

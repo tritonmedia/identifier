@@ -125,6 +125,8 @@ github.com/tritonmedia/kitsu v0.2.4-0.20190811161725-5fa03d532d0f h1:Ehtonfj+iF8
 github.com/tritonmedia/kitsu v0.2.4-0.20190811161725-5fa03d532d0f/go.mod h1:92zYYjvnxsmFZ62tHESV9hJvN9gr5eEe5kfdLdyxE7c=
 github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190818155310-3262d6bf0aec h1:akFY37WJrv1uVVsGj7JBRVNbKfG1omGypu7qc96j8Tc=
 github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190818155310-3262d6bf0aec/go.mod h1:nMLKgW2zyuRGpfDUMnS6uBv6xfFMt7jUX3chgSB1iaE=
+github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190912233825-4610fe4ce16e h1:n8wm6sANFSnNdnZbxoLtqYcIeTq+xZigptRHuDP4apk=
+github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190912233825-4610fe4ce16e/go.mod h1:nMLKgW2zyuRGpfDUMnS6uBv6xfFMt7jUX3chgSB1iaE=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=

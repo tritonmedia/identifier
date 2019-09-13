@@ -22,10 +22,13 @@ import (
 )
 
 func main() {
-	log.SetFormatter(&log.JSONFormatter{})
-
 	if os.Getenv("IDENTIFIER_DEBUG") != "" {
 		log.SetReportCaller(true)
+	}
+
+	logFormat := strings.ToLower(os.Getenv("LOG_FORMAT"))
+	if logFormat == "json" {
+		log.SetFormatter(&log.JSONFormatter{})
 	}
 
 	enabledProviders := []api.Media_MetadataType{api.Media_TVDB, api.Media_TMDB, api.Media_IMDB, api.Media_KITSU}
@@ -143,7 +146,7 @@ func main() {
 		log.Fatalf("failed to create osdb client: %v", err)
 	}
 
-	oc.UserAgent = "TemporaryUserAgent"
+	oc.UserAgent = "tritonmedia-identifier v1"
 
 	// TODO(jaredallard): support for multiple different languages
 	if err := oc.LogIn(os.Getenv("OSDB_USERNAME"), os.Getenv("OSDB_PASSWORD"), "eng"); err != nil {
@@ -177,7 +180,7 @@ func main() {
 		}
 
 		for msg := range msgs {
-			go v1identify.Process(msg)
+			v1identify.Process(msg)
 		}
 	}()
 
@@ -189,6 +192,6 @@ func main() {
 	}
 
 	for msg := range msgs {
-		go v1identifynewfile.Process(msg)
+		v1identifynewfile.Process(msg)
 	}
 }

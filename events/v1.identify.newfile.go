@@ -2,6 +2,7 @@ package events
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -13,8 +14,8 @@ import (
 	"github.com/minio/minio-go"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/streadway/amqp"
 	"github.com/tritonmedia/identifier/pkg/providerapi"
+	"github.com/tritonmedia/identifier/pkg/rabbitmq"
 	api "github.com/tritonmedia/tritonmedia.go/pkg/proto"
 )
 
@@ -39,15 +40,14 @@ func (p *V1IdentifyNewFileProcessor) downloadSubtitles(s *providerapi.Series, e 
 		p.config.OSDB.Token,
 		[]interface{}{
 			map[string]string{
-				"query":         query,
-				"sublanguageid": "eng",
-				"episode":       strconv.Itoa(int(e.SeasonNumber)),
-				"season":        strconv.Itoa(e.Season),
+				"query":   query,
+				"episode": strconv.Itoa(int(e.SeasonNumber)),
+				"season":  strconv.Itoa(e.Season),
 			},
 		},
 	}
 
-	log.Infof("searching osdb for '%s'", query)
+	log.Infof("searching osdb for '%s': episode=%d,season=%d", query, e.SeasonNumber, e.Season)
 	subs, err := p.config.OSDB.SearchSubtitles(&params)
 	if err != nil && strings.Contains(err.Error(), "429") {
 		log.Warnf("handling 429...")
@@ -57,77 +57,96 @@ func (p *V1IdentifyNewFileProcessor) downloadSubtitles(s *providerapi.Series, e 
 		return errors.Wrapf(err, "failed to search for subtitles with query '%s'", query)
 	}
 
-	if len(subs) == 0 {
-		return fmt.Errorf("failed to find any subtitles with query '%s'", query)
-	}
+	for _, subtitle := range subs {
+		b, err := json.Marshal(subtitle)
+		fmt.Println(string(b))
 
-	subtitle := subs[0]
-
-	subtitleID, err := strconv.Atoi(subtitle.IDSubtitleFile)
-	if err != nil {
-		return errors.Wrap(err, "failed to convert subtitle file id to an int")
-	}
-
-	files, err := p.config.OSDB.DownloadSubtitlesByIds([]int{subtitleID})
-	if err != nil && strings.Contains(err.Error(), "429") {
-		log.Warnf("handling 429...")
-		time.Sleep(5 * time.Second)
-		return p.downloadSubtitles(s, e)
-	} else if err != nil {
-		return errors.Wrap(err, "failed to download subtitle")
-	}
-
-	if len(files) != 1 {
-		return fmt.Errorf("downloaded more than one sub")
-	}
-
-	reader, err := files[0].Reader()
-	if err != nil {
-		return errors.Wrap(err, "failed to get subtitle reader from dl")
-	}
-	defer reader.Close()
-
-	var subtitleReader io.Reader
-	switch subtitle.SubFormat {
-	case "srt":
-		subtitleReader = reader
-		break
-	case "ass", "ssa":
-		log.Infof("converting SSA/ASS to SRT")
-		buf := &bytes.Buffer{}
-		c, err := astisub.ReadFromSSA(reader)
+		subtitleID, err := strconv.Atoi(subtitle.IDSubtitleFile)
 		if err != nil {
-			return errors.Wrap(err, "failed to convert from SSA/ASS to SRT")
+			return errors.Wrap(err, "failed to convert subtitle file id to an int")
 		}
-		if err := c.WriteToSRT(buf); err != nil {
-			return errors.Wrap(err, "failed to convert from SSA/ASS to SRT")
+
+		files, err := p.config.OSDB.DownloadSubtitlesByIds([]int{subtitleID})
+		if err != nil && strings.Contains(err.Error(), "429") {
+			log.Warnf("handling 429...")
+			time.Sleep(5 * time.Second)
+			return p.downloadSubtitles(s, e)
+		} else if err != nil {
+			return errors.Wrap(err, "failed to download subtitle")
 		}
-		subtitleReader = buf
-	default:
-		return fmt.Errorf("unsupported subtitle format '%s'", subtitle.SubFormat)
-	}
 
-	_, subKey, err := p.config.DB.NewSubtitle(s, e, &subtitle)
-	if err != nil {
-		return errors.Wrap(err, "failed to create db entry for subtitle")
-	}
+		if len(files) != 1 {
+			return fmt.Errorf("downloaded more than one sub")
+		}
 
-	// TODO(jaredallard): don't hardcode bucket here
-	// subtitles/<media-id>/<episode-id>/<subtitle-id>.<ext>
-	if _, err := p.config.S3Client.PutObject("triton-media", subKey, subtitleReader, -1, minio.PutObjectOptions{}); err != nil {
-		return err
+		reader, err := files[0].Reader()
+		if err != nil {
+			return errors.Wrap(err, "failed to get subtitle reader from dl")
+		}
+		defer reader.Close()
+
+		var subtitleReader io.Reader
+		switch subtitle.SubFormat {
+		case "vtt":
+			subtitleReader = reader
+		case "srt":
+			log.Infof("converting SRT to VTT")
+			buf := &bytes.Buffer{}
+			c, err := astisub.ReadFromSRT(reader)
+			if err != nil {
+				return errors.Wrap(err, "failed to convert from SRT to VTT")
+			}
+			if err := c.WriteToWebVTT(buf); err != nil {
+				return errors.Wrap(err, "failed to convert from SRTto VTT")
+			}
+			subtitleReader = buf
+			break
+		case "ass", "ssa":
+			log.Infof("converting SSA/ASS to VTT")
+			buf := &bytes.Buffer{}
+			c, err := astisub.ReadFromSSA(reader)
+			if err != nil {
+				return errors.Wrap(err, "failed to convert from SSA/ASS to VTT")
+			}
+			if err := c.WriteToWebVTT(buf); err != nil {
+				return errors.Wrap(err, "failed to convert from SSA/ASS to VTT")
+			}
+			subtitleReader = buf
+		default:
+			return fmt.Errorf("unsupported subtitle format '%s'", subtitle.SubFormat)
+		}
+
+		_, subKey, err := p.config.DB.NewSubtitle(s, e, &subtitle)
+		if err != nil {
+			return errors.Wrap(err, "failed to create db entry for subtitle")
+		}
+
+		// TODO(jaredallard): don't hardcode bucket here
+		// subtitles/<media-id>/<episode-id>/<subtitle-id>.<ext>
+		if _, err := p.config.S3Client.PutObject("triton-media", subKey, subtitleReader, -1, minio.PutObjectOptions{}); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
 // Process processes a AMQP message
-func (p *V1IdentifyNewFileProcessor) Process(msg amqp.Delivery) error {
+func (p *V1IdentifyNewFileProcessor) Process(msg *rabbitmq.Delivery) error {
 	var job api.IdentifyNewFile
-	if err := proto.Unmarshal(msg.Body, &job); err != nil {
+	if err := proto.Unmarshal(msg.Delivery.Body, &job); err != nil {
 		log.WithField("event", "decode-message").Errorf("failed to unmarshal rabbitmq message into protobuf format: %v", err)
-		if err := msg.Ack(false); err != nil {
+		if err := msg.Ack(); err != nil {
 			log.Warnf("failed to ack failed message: %v", err)
+		}
+		return nil
+	}
+
+	// stop after 5 retries
+	if msg.Metadata.Retries > 5 {
+		log.Warnf("skipping message that has failed 5 times: id=%s", job.Media.Id)
+		if err := msg.Nack(); err != nil {
+			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
 	}
@@ -137,10 +156,7 @@ func (p *V1IdentifyNewFileProcessor) Process(msg amqp.Delivery) error {
 	if err != nil {
 		log.Errorf("failed to find series by id: %v", err)
 
-		// TODO(jaredallard): don't do this here
-		time.Sleep(10 * time.Second)
-
-		if err := msg.Nack(false, true); err != nil {
+		if err := msg.Error(); err != nil {
 			log.Warnf("failed to ack failed message: %v", err)
 		}
 		return nil
@@ -154,11 +170,8 @@ func (p *V1IdentifyNewFileProcessor) Process(msg amqp.Delivery) error {
 		// https://forums.thetvdb.com/viewtopic.php?t=28709
 		log.Errorf("failed to find episode id: %v", err)
 
-		// TODO(jaredallard): don't do this here
-		time.Sleep(10 * time.Second)
-
-		if err := msg.Nack(false, true); err != nil {
-			log.Warnf("failed to ack failed message: %v", err)
+		if err := msg.Nack(); err != nil {
+			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
 	}
@@ -168,7 +181,7 @@ func (p *V1IdentifyNewFileProcessor) Process(msg amqp.Delivery) error {
 	if err != nil {
 		log.Errorf("failed to find episode by id: %v", err)
 		// TODO(jaredallard): add backoff or something to these
-		if err := msg.Ack(false); err != nil {
+		if err := msg.Error(); err != nil {
 			log.Warnf("failed to ack failed message: %v", err)
 		}
 		return nil
@@ -179,7 +192,7 @@ func (p *V1IdentifyNewFileProcessor) Process(msg amqp.Delivery) error {
 		ID: eID,
 	}, job.Key, job.Quality); err != nil {
 		log.Errorf("failed to add episode to the database: %v", err)
-		if err := msg.Nack(false, true); err != nil {
+		if err := msg.Nack(); err != nil {
 			log.Warnf("failed to nack failed message: %v", err)
 		}
 		return nil
@@ -194,9 +207,8 @@ func (p *V1IdentifyNewFileProcessor) Process(msg amqp.Delivery) error {
 	// ACK
 	// --------
 	log.Infof("episode file added")
-	if err := msg.Ack(false); err != nil {
+	if err := msg.Ack(); err != nil {
 		log.Warnf("failed to ack: %v", err)
-		return nil // explicit continue here in case anything is added below
 	}
 
 	return nil

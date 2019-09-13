@@ -161,7 +161,7 @@ func (c *Client) Publish(topic string, body []byte) error {
 }
 
 // Consume from a RabbitMQ queue
-func (c *Client) Consume(topic string) (<-chan amqp.Delivery, error) {
+func (c *Client) Consume(topic string) (<-chan *Delivery, error) {
 	// TODO(jaredallard): handle channel disconnect and allow stopping
 	aChan, err := c.getChannel()
 	if err != nil {
@@ -175,7 +175,7 @@ func (c *Client) Consume(topic string) (<-chan amqp.Delivery, error) {
 		return nil, ErrorEnsureConsumerQueues
 	}
 
-	multiplexer := make(chan amqp.Delivery)
+	multiplexer := make(chan *Delivery)
 	for i := 0; i != c.numConsumerQueues; i++ {
 		queue := c.getRk(topic, i)
 		ch, err := aChan.Consume(queue, "", false, false, false, false, nil)
@@ -187,10 +187,15 @@ func (c *Client) Consume(topic string) (<-chan amqp.Delivery, error) {
 		go func() {
 			for {
 				msg := <-ch
-				multiplexer <- msg
+				d, err := NewDelivery(msg, aChan)
+				if err != nil {
+					// TODO(jaredallard): don't skip errors
+					continue
+				}
+				multiplexer <- d
 			}
 		}()
 	}
 
-	return (<-chan amqp.Delivery)(multiplexer), nil
+	return (<-chan *Delivery)(multiplexer), nil
 }
