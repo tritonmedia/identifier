@@ -90,7 +90,7 @@ func main() {
 		providers[p] = provider
 	} // for loop end
 
-	amqpEndpoint := os.Getenv("IDENTIFIER_RABBITMQ_ENDPOINT")
+	amqpEndpoint := os.Getenv("RABBITMQ")
 	if amqpEndpoint == "" {
 		amqpEndpoint = "amqp://user:bitnami@127.0.0.1:5672"
 		log.Warnf("IDENTIFIER_RABBITMQ_ENDPOINT not defined, defaulting to local config: %s", amqpEndpoint)
@@ -108,7 +108,7 @@ func main() {
 		log.Fatalf("failed to initialize postgres: %v", err)
 	}
 
-	b := "IDENTIFIER_S3_"
+	b := "S3_"
 
 	var ssl bool
 	endpoint := os.Getenv(b + "ENDPOINT")
