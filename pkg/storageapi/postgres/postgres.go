@@ -62,6 +62,7 @@ func NewClient() (*Client, error) {
 			ConnConfig: pgx.ConnConfig{
 				Host:     pgEndpoint,
 				User:     "postgres",
+				Password: os.Getenv("POSTGRES_PASSWORD"),
 				Database: "media",
 			},
 		})
