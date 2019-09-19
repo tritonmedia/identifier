@@ -4,6 +4,7 @@ package rabbitmq
 import (
 	"errors"
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/streadway/amqp"
@@ -46,7 +47,9 @@ func NewClient(endpoint string) (*Client, error) {
 	// TODO(jaredallard): maybe give up at a certain point?
 	err := backoff.Retry(func() error {
 		var err error
-		conn, err = amqp.Dial(endpoint)
+
+		fqendpoint := fmt.Sprintf("amqp://%s:%s@%s", os.Getenv("RABBITMQ_USERNAME"), os.Getenv("RABBITMQ_PASSWORD"), endpoint)
+		conn, err = amqp.Dial(fqendpoint)
 		if err != nil {
 			log.Errorf("failed to dial rabbitmq: %v", err)
 			return err
