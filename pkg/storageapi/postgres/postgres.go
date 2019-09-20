@@ -49,10 +49,10 @@ func NewClient() (*Client, error) {
 
 	var conn *pgx.ConnPool
 
-	pgEndpoint := os.Getenv("IDENTIFIER_POSTGRES_ENDPOINT")
+	pgEndpoint := os.Getenv("POSTGRES_ENDPOINT")
 	if pgEndpoint == "" {
 		pgEndpoint = "127.0.0.1"
-		log.Warnf("IDENTIFIER_POSTGRES_ENDPOINT not defined, defaulting to local config: %s", pgEndpoint)
+		log.Warnf("POSTGRES_ENDPOINT not defined, defaulting to local config: %s", pgEndpoint)
 	}
 
 	// TODO(jaredallard): give up eventually
