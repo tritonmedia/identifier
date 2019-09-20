@@ -17,7 +17,7 @@ ENTRYPOINT ["/usr/bin/identifier"]
 # Install runtime dependencies
 RUN DEBIAN_FRONTEND=noninteractive \
   apt-get update && \
-  apt-get install --no-install-recommends -y libvips && \
+  apt-get install --no-install-recommends -y libvips ca-certificates && \
   apt-get autoremove -y && \
   apt-get autoclean && \
   apt-get clean && \
