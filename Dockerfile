@@ -1,4 +1,4 @@
-FROM golang:1.13.0-buster AS builder
+FROM golang:1.13.1-buster AS builder
 WORKDIR /src/app
 
 # Build deps
