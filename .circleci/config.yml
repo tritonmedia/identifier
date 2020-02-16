@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: docker:19.03.1
+      - image: docker:19.03.6
     steps:
       # Needed for local testing
       - run: apk add --no-cache git
