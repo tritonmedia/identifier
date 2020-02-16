@@ -18,7 +18,7 @@ require (
 	github.com/lib/pq v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.9 // indirect
-	github.com/minio/minio-go v6.0.14+incompatible
+	github.com/minio/minio-go v6.0.48+incompatible
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/oz/osdb v0.0.0-20190204162748-da06ada9cdc1
 	github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9
