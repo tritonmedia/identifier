@@ -24,7 +24,7 @@ require (
 	github.com/oz/osdb v0.0.0-20190204162748-da06ada9cdc1
 	github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9
 	github.com/pkg/errors v0.8.1
-	github.com/ryanbradynd05/go-tmdb v0.0.0-20181220020137-291a20d25ffd
+	github.com/ryanbradynd05/go-tmdb v0.0.0-20190901200645-e8dd22863620
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24 // indirect
 	github.com/sirupsen/logrus v1.4.2
