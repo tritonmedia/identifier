@@ -1,7 +1,7 @@
 package events
 
 import (
-	"github.com/minio/minio-go"
+	"github.com/minio/minio-go/v6"
 	"github.com/oz/osdb"
 	"github.com/tritonmedia/identifier/pkg/image"
 	"github.com/tritonmedia/identifier/pkg/providerapi"

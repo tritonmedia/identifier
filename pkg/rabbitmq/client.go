@@ -11,7 +11,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	// don't reimplement the wheel
-	"github.com/cenkalti/backoff"
+	"github.com/cenkalti/backoff/v4"
 )
 
 // Client is a RabbitMQ client

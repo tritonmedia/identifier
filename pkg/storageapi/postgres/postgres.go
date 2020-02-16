@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cenkalti/backoff"
-	"github.com/gofrs/uuid"
-	"github.com/jackc/pgx"
+	"github.com/cenkalti/backoff/v4"
+	"github.com/gofrs/uuid/v3"
+	"github.com/jackc/pgx/v4"
 	"github.com/oz/osdb"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

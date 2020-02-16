@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/minio/minio-go"
+	"github.com/minio/minio-go/v6"
 	"github.com/oz/osdb"
 	log "github.com/sirupsen/logrus"
 	"github.com/tritonmedia/identifier/events"

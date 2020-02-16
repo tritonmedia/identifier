@@ -11,7 +11,7 @@ import (
 
 	astisub "github.com/asticode/go-astisub"
 	"github.com/golang/protobuf/proto"
-	"github.com/minio/minio-go"
+	"github.com/minio/minio-go/v6"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tritonmedia/identifier/pkg/providerapi"
