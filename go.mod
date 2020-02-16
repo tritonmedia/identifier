@@ -6,6 +6,7 @@ require (
 	github.com/asticode/go-astisub v0.2.0
 	github.com/asticode/go-astitools v1.1.0 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible
+	github.com/cenkalti/backoff/v4 v4.0.0
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/go-ini/ini v1.46.0 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
