@@ -3,9 +3,8 @@ module github.com/tritonmedia/identifier
 go 1.12
 
 require (
-	github.com/asticode/go-astisub v0.0.0-20190514140258-c0ed7925c393
+	github.com/asticode/go-astisub v0.2.0
 	github.com/asticode/go-astitools v1.1.0 // indirect
-	github.com/asticode/go-astits v1.0.0 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/go-ini/ini v1.46.0 // indirect
@@ -37,7 +36,6 @@ require (
 	golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472 // indirect
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80 // indirect
 	golang.org/x/sys v0.0.0-20190904154756-749cb33beabd // indirect
-	golang.org/x/text v0.3.2 // indirect
 	gopkg.in/h2non/bimg.v1 v1.0.19
 	gopkg.in/ini.v1 v1.46.0 // indirect
 )
