@@ -162,6 +162,7 @@ github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
+github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/tritonmedia/jikan-go v0.0.0-20190825200127-0974c3ed2c8c h1:HWUp+RHUBdlI/e+ZcKU5hVTvO0BiPx3bUNx4NIonfEc=
 github.com/tritonmedia/jikan-go v0.0.0-20190825200127-0974c3ed2c8c/go.mod h1:aeJusO+PwfDN/QM71GwZwJCIbAGqWz07+6ESNKUNIFM=
 github.com/tritonmedia/kitsu v0.2.4-0.20190811161725-5fa03d532d0f h1:Ehtonfj+iF8sAJqSETm92girbbv9biryD2WZ3a7op5E=
