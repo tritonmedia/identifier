@@ -11,7 +11,7 @@ require (
 	github.com/jackc/pgx/v4 v4.4.1
 	github.com/kolo/xmlrpc v0.0.0-20190717152603-07c4ee3fd181 // indirect
 	github.com/kylelemons/go-gypsy v0.0.0-20160905020020-08cad365cd28 // indirect
-	github.com/minio/minio-go/v6 v6.0.48
+	github.com/minio/minio-go/v6 v6.0.49
 	github.com/oz/osdb v0.0.0-20190204162748-da06ada9cdc1
 	github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9
 	github.com/pkg/errors v0.9.1
