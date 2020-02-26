@@ -20,7 +20,7 @@ require (
 	github.com/smartystreets/assertions v0.0.0-20190215210624-980c5ac6f3ac // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337 // indirect
 	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.1
 	github.com/tritonmedia/jikan-go v0.0.0-20190825200127-0974c3ed2c8c
 	github.com/tritonmedia/kitsu v0.2.4-0.20190811161725-5fa03d532d0f
 	github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190912233825-4610fe4ce16e
