@@ -8,7 +8,7 @@ require (
 	github.com/gofrs/uuid/v3 v3.1.2
 	github.com/golang/protobuf v1.3.4
 	github.com/gopherjs/gopherjs v0.0.0-20190910122728-9d188e94fb99 // indirect
-	github.com/jackc/pgx/v4 v4.4.1
+	github.com/jackc/pgx/v4 v4.5.0
 	github.com/kolo/xmlrpc v0.0.0-20190717152603-07c4ee3fd181 // indirect
 	github.com/kylelemons/go-gypsy v0.0.0-20160905020020-08cad365cd28 // indirect
 	github.com/minio/minio-go/v6 v6.0.49
