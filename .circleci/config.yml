@@ -1,7 +1,7 @@
 jobs:
   build:
     docker:
-    - image: docker:19.03.6
+    - image: docker:19.03.8
     steps:
     - checkout
     - setup_remote_docker:
