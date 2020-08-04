@@ -16,7 +16,7 @@ require (
 	github.com/kylelemons/go-gypsy v0.0.0-20160905020020-08cad365cd28 // indirect
 	github.com/minio/minio-go/v6 v6.0.49
 	github.com/oz/osdb v0.0.0-20190204162748-da06ada9cdc1
-	github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9
+	github.com/pioz/tvdb 6d5b1ef61c13
 	github.com/pkg/errors v0.9.1
 	github.com/ryanbradynd05/go-tmdb v0.0.0-20190901200645-e8dd22863620
 	github.com/sirupsen/logrus v1.5.0
