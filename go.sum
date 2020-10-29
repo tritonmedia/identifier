@@ -167,6 +167,8 @@ github.com/rs/zerolog v1.13.0/go.mod h1:YbFCdg8HfsridGWAh22vktObvhZbQsZXe4/zB0OK
 github.com/rs/zerolog v1.15.0/go.mod h1:xYTKnLHcpfU2225ny5qZjxnj9NvkumZYjJHlAThCjNc=
 github.com/ryanbradynd05/go-tmdb v0.0.0-20190901200645-e8dd22863620 h1:/tqL3Q8rBvQOqeUgi9UTgUQof/JVwdlw3jxMMpeIwos=
 github.com/ryanbradynd05/go-tmdb v0.0.0-20190901200645-e8dd22863620/go.mod h1:k/112WTJ3EoR7wjhtx8kOXO22CKNvJy+rNzGPXnuEsI=
+github.com/ryanbradynd05/go-tmdb v0.0.0-20201006144520-c0566c3d1506 h1:UJ2ing2xklR2MHms4DNR0jd0kiPa9x1kFSLQs1/31qk=
+github.com/ryanbradynd05/go-tmdb v0.0.0-20201006144520-c0566c3d1506/go.mod h1:k/112WTJ3EoR7wjhtx8kOXO22CKNvJy+rNzGPXnuEsI=
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24 h1:pntxY8Ary0t43dCZ5dqY4YTJCObLY1kIXl0uzMv+7DE=
 github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24/go.mod h1:M+9NzErvs504Cn4c5DxATwIqPbtswREoFCre64PpcG4=
