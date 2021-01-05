@@ -6,7 +6,7 @@ require (
 	github.com/asticode/go-astisub v0.2.0
 	github.com/cenkalti/backoff/v4 v4.0.2
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
-	github.com/gofrs/uuid/v3 v3.1.2
+	github.com/gofrs/uuid/v3 v3.4.0
 	github.com/golang/protobuf v1.4.0
 	github.com/gopherjs/gopherjs v0.0.0-20190910122728-9d188e94fb99 // indirect
 	github.com/jackc/pgx/v4 v4.6.0
