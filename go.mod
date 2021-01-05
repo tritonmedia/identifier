@@ -9,7 +9,7 @@ require (
 	github.com/gofrs/uuid/v3 v3.1.2
 	github.com/golang/protobuf v1.4.0
 	github.com/gopherjs/gopherjs v0.0.0-20190910122728-9d188e94fb99 // indirect
-	github.com/jackc/pgx/v4 v4.6.0
+	github.com/jackc/pgx/v4 v4.10.1
 	github.com/kolo/xmlrpc v0.0.0-20190717152603-07c4ee3fd181 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pty v1.1.8 // indirect
@@ -29,8 +29,7 @@ require (
 	github.com/tritonmedia/kitsu v0.2.4-0.20190811161725-5fa03d532d0f
 	github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190912233825-4610fe4ce16e
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa // indirect
-	golang.org/x/sys v0.0.0-20200122134326-e047566fdf82 // indirect
-	golang.org/x/tools v0.0.0-20190823170909-c4a336ef6a2f // indirect
+	golang.org/x/tools v0.0.0-20191029190741-b9c20aec41a5 // indirect
 	gopkg.in/h2non/bimg.v1 v1.1.2
 	gopkg.in/ini.v1 v1.46.0 // indirect
 	gopkg.in/yaml.v2 v2.2.7 // indirect
