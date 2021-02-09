@@ -155,6 +155,8 @@ github.com/oz/osdb v0.0.0-20190204162748-da06ada9cdc1 h1:yxQkNBp/nQAJE3p/0A7vdIE
 github.com/oz/osdb v0.0.0-20190204162748-da06ada9cdc1/go.mod h1:xIvcOs03IPml6sU+k9o/mEAm8aJhvGTSpDNlUs8RoOQ=
 github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9 h1:bduYa9c0qpYfrxuAnursm8RfmeGsdgQeB3NeW4N0zQ8=
 github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9/go.mod h1:nhHRTrbEzdp4lXtiozX4Yuvo4AHi29nOvM1J7H/XJMM=
+github.com/pioz/tvdb v0.0.0-20200804122320-6d5b1ef61c13 h1:yqj2COB4SN6t3xmImSjnEAIvLeLKL3p4pi7CGknZvNc=
+github.com/pioz/tvdb v0.0.0-20200804122320-6d5b1ef61c13/go.mod h1:nhHRTrbEzdp4lXtiozX4Yuvo4AHi29nOvM1J7H/XJMM=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
