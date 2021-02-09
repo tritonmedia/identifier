@@ -31,7 +31,7 @@ require (
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa // indirect
 	golang.org/x/sys v0.0.0-20200122134326-e047566fdf82 // indirect
 	golang.org/x/tools v0.0.0-20190823170909-c4a336ef6a2f // indirect
-	gopkg.in/h2non/bimg.v1 v1.1.2
+	gopkg.in/h2non/bimg.v1 v1.1.5
 	gopkg.in/ini.v1 v1.46.0 // indirect
 	gopkg.in/yaml.v2 v2.2.7 // indirect
 )
