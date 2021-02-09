@@ -18,7 +18,7 @@ require (
 	github.com/oz/osdb v0.0.0-20190204162748-da06ada9cdc1
 	github.com/pioz/tvdb v0.0.0-20190503215423-f45c687faba9
 	github.com/pkg/errors v0.9.1
-	github.com/ryanbradynd05/go-tmdb v0.0.0-20190901200645-e8dd22863620
+	github.com/ryanbradynd05/go-tmdb v0.0.0-20201006144520-c0566c3d1506
 	github.com/sirupsen/logrus v1.5.0
 	github.com/smartystreets/assertions v0.0.0-20190215210624-980c5ac6f3ac // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337 // indirect
