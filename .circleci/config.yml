@@ -16,7 +16,7 @@ jobs:
         name: Publish "tritonmedia/identifier" Docker Image
   tests:
     docker:
-    - image: circleci/golang:1.14
+    - image: circleci/golang:1.16
     steps:
     - checkout
     - restore_cache:
