@@ -9,7 +9,7 @@ require (
 	github.com/gofrs/uuid/v3 v3.1.2
 	github.com/golang/protobuf v1.4.0
 	github.com/gopherjs/gopherjs v0.0.0-20190910122728-9d188e94fb99 // indirect
-	github.com/jackc/pgx/v4 v4.6.0
+	github.com/jackc/pgx/v4 v4.11.0
 	github.com/kolo/xmlrpc v0.0.0-20190717152603-07c4ee3fd181 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pty v1.1.8 // indirect
