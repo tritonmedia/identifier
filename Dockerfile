@@ -11,7 +11,7 @@ COPY . /src/app
 RUN go mod vendor
 RUN make
 
-FROM debian:10
+FROM debian:11
 ENTRYPOINT ["/usr/bin/identifier"]
 
 # Install runtime dependencies
