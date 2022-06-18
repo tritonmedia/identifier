@@ -193,6 +193,7 @@ github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
+github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H4=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/tritonmedia/jikan-go v0.0.0-20190825200127-0974c3ed2c8c h1:HWUp+RHUBdlI/e+ZcKU5hVTvO0BiPx3bUNx4NIonfEc=
 github.com/tritonmedia/jikan-go v0.0.0-20190825200127-0974c3ed2c8c/go.mod h1:aeJusO+PwfDN/QM71GwZwJCIbAGqWz07+6ESNKUNIFM=
@@ -262,6 +263,8 @@ gopkg.in/h2non/bimg.v1 v1.0.19 h1:Li7mgBrIvCHvShB4nyCcGJ2Z2rWR/95kgI/U2+U2eYw=
 gopkg.in/h2non/bimg.v1 v1.0.19/go.mod h1:PgsZL7dLwUbsGm1NYps320GxGgvQNTnecMCZqxV11So=
 gopkg.in/h2non/bimg.v1 v1.1.2 h1:b9tY8AIzLS4VnVcphLhGs1HndaJf2wtGX0BRXl1LGmU=
 gopkg.in/h2non/bimg.v1 v1.1.2/go.mod h1:PgsZL7dLwUbsGm1NYps320GxGgvQNTnecMCZqxV11So=
+gopkg.in/h2non/bimg.v1 v1.1.9 h1:wZIUbeOnwr37Ta4aofhIv8OI8v4ujpjXC9mXnAGpQjM=
+gopkg.in/h2non/bimg.v1 v1.1.9/go.mod h1:PgsZL7dLwUbsGm1NYps320GxGgvQNTnecMCZqxV11So=
 gopkg.in/h2non/gock.v1 v1.0.15 h1:SzLqcIlb/fDfg7UvukMpNcWsu7sI5tWwL+KCATZqks0=
 gopkg.in/h2non/gock.v1 v1.0.15/go.mod h1:sX4zAkdYX1TRGJ2JY156cFspQn4yRWn6p9EMdODlynE=
 gopkg.in/inconshreveable/log15.v2 v2.0.0-20180818164646-67afb5ed74ec/go.mod h1:aPpfJ7XW+gOuirDoZ8gHhLh3kZ1B08FtV2bbmy7Jv3s=
