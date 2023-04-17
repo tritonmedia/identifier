@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/asticode/go-astisub v0.2.0
-	github.com/cenkalti/backoff/v4 v4.0.2
+	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
 	github.com/gofrs/uuid/v3 v3.1.2
 	github.com/golang/protobuf v1.4.0
