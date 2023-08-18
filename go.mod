@@ -3,7 +3,7 @@ module github.com/tritonmedia/identifier
 go 1.12
 
 require (
-	github.com/asticode/go-astisub v0.2.0
+	github.com/asticode/go-astisub v0.26.0
 	github.com/cenkalti/backoff/v4 v4.0.2
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
 	github.com/gofrs/uuid/v3 v3.1.2
@@ -28,8 +28,6 @@ require (
 	github.com/tritonmedia/jikan-go v0.0.0-20190825200127-0974c3ed2c8c
 	github.com/tritonmedia/kitsu v0.2.4-0.20190811161725-5fa03d532d0f
 	github.com/tritonmedia/tritonmedia.go v1.0.3-0.20190912233825-4610fe4ce16e
-	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa // indirect
-	golang.org/x/sys v0.0.0-20200122134326-e047566fdf82 // indirect
 	golang.org/x/tools v0.0.0-20190823170909-c4a336ef6a2f // indirect
 	gopkg.in/h2non/bimg.v1 v1.1.2
 	gopkg.in/ini.v1 v1.46.0 // indirect
